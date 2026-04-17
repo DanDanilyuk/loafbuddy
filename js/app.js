@@ -26,6 +26,11 @@ function displayGrams(id, value) {
   document.getElementById(id).textContent = clamp(value).toFixed(1) + ' g';
 }
 
+function displayGramsWithPct(id, grams, percent) {
+  const pctText = Number(percent.toFixed(1)).toString();
+  document.getElementById(id).textContent = clamp(grams).toFixed(1) + ' g \u00B7 ' + pctText + '%';
+}
+
 // ---------------------------------------------------------------------------
 // Tab Navigation
 // ---------------------------------------------------------------------------
@@ -212,10 +217,10 @@ function calculateBread() {
   const waterToAdd = totalWater - waterInStarter;
   const salt = totalFlour * (saltPercent / 100);
 
-  displayGrams('netStarter', starterWeight);
-  displayGrams('additionalFlour', flourToAdd);
-  displayGrams('additionalWater', waterToAdd);
-  displayGrams('salt', salt);
+  displayGramsWithPct('netStarter', starterWeight, starterPercentage);
+  displayGramsWithPct('additionalFlour', flourToAdd, 100);
+  displayGramsWithPct('additionalWater', waterToAdd, doughHydration);
+  displayGramsWithPct('salt', salt, saltPercent);
   displayGrams('totalDough', clamp(starterWeight) + clamp(flourToAdd) + clamp(waterToAdd) + clamp(salt));
 }
 
