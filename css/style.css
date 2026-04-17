@@ -512,6 +512,16 @@ footer p {
   .starter-pct-buttons {
     grid-template-columns: 1fr;
   }
+
+  .reset-btn.hidden {
+    display: inline-block;
+    visibility: hidden;
+  }
+
+  .tab-row {
+    gap: 8px;
+    margin-bottom: 5px;
+  }
 }
 
 .hidden {
