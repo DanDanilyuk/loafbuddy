@@ -116,7 +116,7 @@ function applyHashState() {
         if (params.has('ft')) {
           const ft = params.get('ft');
           if (VALID_FLOUR_TYPES.indexOf(ft) !== -1) {
-            setFlourType(ft, null);
+            setFlourType(ft);
           }
         }
         if (params.has('d')) {
@@ -322,7 +322,7 @@ function useStarterInRecipe() {
 // Bread Baking - UI Controls
 // ---------------------------------------------------------------------------
 
-function setFlourType(type, recommendedHydration) {
+function setFlourType(type) {
   const labels = { ap: 'All-Purpose', bread: 'Bread Flour', ww: 'Whole Wheat', rye: 'Rye', spelt: 'Spelt', mix: 'Mixed' };
   setActiveButton('.flour-btn', '.flour-label', labels[type]);
 
@@ -332,11 +332,7 @@ function setFlourType(type, recommendedHydration) {
   if (mixedHint) mixedHint.classList.toggle('hidden', !isMixed);
   if (doughHydrationGroup) doughHydrationGroup.classList.toggle('needs-attention', isMixed);
 
-  if (recommendedHydration !== null) {
-    setDoughHydration(recommendedHydration);
-  } else {
-    calculateBread();
-  }
+  calculateBread();
 }
 
 function setBreadStarterHydration(value) {
@@ -397,7 +393,7 @@ function resetCalculator() {
   if (customBtn) customBtn.classList.remove('active');
   setDoughWeight(900);
   setStarterPercentage(20);
-  setFlourType('bread', 75);
+  setFlourType('bread');
   setBreadStarterHydration(75);
   setDoughHydration(75);
 
