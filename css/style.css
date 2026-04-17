@@ -434,6 +434,14 @@ input[type="number"]:focus::-webkit-outer-spin-button {
   box-shadow: 0 0 0 2px #fff, 0 1px 2px rgba(0, 0, 0, 0.08);
 }
 
+.weight-btn--custom .weight-btn-suffix {
+  margin-left: 6px;
+  color: white;
+  font-size: 13px;
+  font-weight: 500;
+  opacity: 0.9;
+}
+
 .sr-only {
   position: absolute;
   width: 1px;
