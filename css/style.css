@@ -293,6 +293,11 @@ input[type="number"]:focus {
   font-weight: 500;
 }
 
+.results .info-text.warning {
+  margin-top: 0;
+  margin-bottom: 12px;
+}
+
 .hydration-btn:focus-visible,
 .flour-btn:focus-visible,
 .time-btn:focus-visible,

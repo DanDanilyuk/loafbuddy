@@ -227,6 +227,19 @@ function calculateBread() {
   const waterToAdd = totalWater - waterInStarter;
   const salt = totalFlour * (saltPercent / 100);
 
+  const breadInfeasibleWarning = document.getElementById('breadInfeasibleWarning');
+  const breadInfeasibleWarningText = document.getElementById('breadInfeasibleWarningText');
+  const negativeFlour = flourToAdd < 0;
+  const negativeWater = !negativeFlour && waterToAdd < 0;
+  if (breadInfeasibleWarning && breadInfeasibleWarningText) {
+    if (negativeFlour) {
+      breadInfeasibleWarningText.textContent = 'That starter carries more flour than this recipe needs, so lower the Starter %.';
+    } else if (negativeWater) {
+      breadInfeasibleWarningText.textContent = 'That starter carries more water than your dough wants, so lower the Starter % or raise the Dough Hydration.';
+    }
+    breadInfeasibleWarning.classList.toggle('hidden', !(negativeFlour || negativeWater));
+  }
+
   displayGramsWithPct('netStarter', starterWeight, starterPercentage);
   displayGramsWithPct('additionalFlour', flourToAdd, 100);
   displayGramsWithPct('additionalWater', waterToAdd, doughHydration);
