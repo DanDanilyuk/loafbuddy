@@ -44,6 +44,23 @@ function showTab(which) {
   tabBread.classList.toggle('active', !isStarter);
   tabStarter.setAttribute('aria-selected', String(isStarter));
   tabBread.setAttribute('aria-selected', String(!isStarter));
+  tabStarter.setAttribute('tabindex', isStarter ? '0' : '-1');
+  tabBread.setAttribute('tabindex', isStarter ? '-1' : '0');
+}
+
+function handleTablistKeydown(event) {
+  const key = event.key;
+  if (key !== 'ArrowLeft' && key !== 'ArrowRight' && key !== 'Home' && key !== 'End') return;
+  event.preventDefault();
+  const tabs = ['starter', 'bread'];
+  const current = document.activeElement && document.activeElement.id === 'tab-bread' ? 1 : 0;
+  let next = current;
+  if (key === 'ArrowRight') next = (current + 1) % tabs.length;
+  else if (key === 'ArrowLeft') next = (current - 1 + tabs.length) % tabs.length;
+  else if (key === 'Home') next = 0;
+  else if (key === 'End') next = tabs.length - 1;
+  showTab(tabs[next]);
+  document.getElementById('tab-' + tabs[next]).focus();
 }
 
 // ---------------------------------------------------------------------------
@@ -209,3 +226,4 @@ function calculateBread() {
 updateRatioLabels();
 calculateStarter();
 calculateBread();
+document.querySelector('.tabs').addEventListener('keydown', handleTablistKeydown);
