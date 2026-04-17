@@ -34,8 +34,8 @@
         <h2>Starter Feeding Calculator</h2>
 
         <div class="input-group">
-          <label>When do you want your starter ready?</label>
-          <div class="time-buttons">
+          <div id="label-time-buttons" class="group-label">When do you want your starter ready?</div>
+          <div class="time-buttons" role="group" aria-labelledby="label-time-buttons">
             <button class="time-btn active" data-ratio-starter="1" data-ratio-flour="1" onclick="setReadyTime(1, 1, 1)">
               <span class="time-label">4-6 hours</span>
               <span class="time-ratio">1:1:1 ratio</span>
@@ -85,8 +85,8 @@
         </div>
 
         <div class="input-group">
-          <label>Hydration:</label>
-          <div class="hydration-buttons">
+          <div id="label-starter-hydration" class="group-label">Hydration:</div>
+          <div class="hydration-buttons" role="group" aria-labelledby="label-starter-hydration">
             <button class="hydration-btn" onclick="setStarterHydration(50)">
               <span class="hydration-label">50%</span>
               <span class="hydration-ratio">2:1 flour:water</span>
@@ -141,8 +141,8 @@
         <h2>Bread Recipe Builder</h2>
 
         <div class="input-group">
-          <label>How much dough do you need?</label>
-          <div class="weight-buttons">
+          <div id="label-dough-weight" class="group-label">How much dough do you need?</div>
+          <div class="weight-buttons" role="group" aria-labelledby="label-dough-weight">
             <button class="weight-btn" onclick="setDoughWeight(650)">
               <span class="hydration-label">Small Loaf</span>
               <span class="hydration-desc">650g</span>
@@ -169,8 +169,8 @@
         </div>
 
         <div class="input-group">
-          <label>How fast should it rise?</label>
-          <div class="starter-pct-buttons">
+          <div id="label-rise-speed" class="group-label">How fast should it rise?</div>
+          <div class="starter-pct-buttons" role="group" aria-labelledby="label-rise-speed">
             <button class="starter-pct-btn" onclick="setStarterPercentage(10)">
               <span class="hydration-label">Slow Rise</span>
               <span class="hydration-ratio">10%</span>
@@ -191,8 +191,8 @@
         </div>
 
         <div class="input-group">
-          <label>What flour are you using?</label>
-          <div class="flour-buttons">
+          <div id="label-flour-type" class="group-label">What flour are you using?</div>
+          <div class="flour-buttons" role="group" aria-labelledby="label-flour-type">
             <button class="flour-btn" onclick="setFlourType('ap', 70)">
               <span class="flour-label">All-Purpose</span>
               <span class="flour-desc">Best at 70% hydration</span>
@@ -221,8 +221,8 @@
         </div>
 
         <div class="input-group">
-          <label>What's your starter's hydration?</label>
-          <div class="starter-hydration-buttons">
+          <div id="label-bread-starter-hydration" class="group-label">What's your starter's hydration?</div>
+          <div class="starter-hydration-buttons" role="group" aria-labelledby="label-bread-starter-hydration">
             <button class="hydration-btn" onclick="setBreadStarterHydration(50)">
               <span class="hydration-label">50%</span>
               <span class="hydration-ratio">2:1 flour:water</span>
@@ -248,8 +248,8 @@
         </div>
 
         <div class="input-group">
-          <label>How wet do you want your dough?</label>
-          <div class="dough-hydration-buttons">
+          <div id="label-dough-hydration" class="group-label">How wet do you want your dough?</div>
+          <div class="dough-hydration-buttons" role="group" aria-labelledby="label-dough-hydration">
             <button class="hydration-btn" onclick="setDoughHydration(65)">
               <span class="hydration-label">65%</span>
               <span class="hydration-ratio">20:13 flour:water</span>
