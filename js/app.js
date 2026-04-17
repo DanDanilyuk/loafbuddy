@@ -91,6 +91,8 @@ function setFlourType(type, recommendedHydration) {
 
   if (recommendedHydration !== null) {
     setDoughHydration(recommendedHydration);
+  } else {
+    calculateBread();
   }
 }
 
