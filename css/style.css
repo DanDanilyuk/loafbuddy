@@ -659,6 +659,7 @@ footer p {
   .tab-btn.active {
     background: #1f2937;
     color: white;
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08), 0 2px 6px rgba(0, 0, 0, 0.35);
   }
 
   .hydration-btn,
