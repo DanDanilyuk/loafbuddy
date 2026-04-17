@@ -332,47 +332,11 @@ function setFlourType(type, recommendedHydration) {
   if (mixedHint) mixedHint.classList.toggle('hidden', !isMixed);
   if (doughHydrationGroup) doughHydrationGroup.classList.toggle('needs-attention', isMixed);
 
-  const prevInjected = document.querySelector('.dough-hydration-buttons .hydration-btn--flour');
-  if (prevInjected) prevInjected.remove();
-
   if (recommendedHydration !== null) {
-    ensureDoughHydrationButton(recommendedHydration, labels[type]);
     setDoughHydration(recommendedHydration);
   } else {
     calculateBread();
   }
-}
-
-function ensureDoughHydrationButton(hydration, flourLabel) {
-  const group = document.querySelector('.dough-hydration-buttons');
-  if (!group) return;
-  const existing = Array.from(group.querySelectorAll('.hydration-btn .hydration-label'))
-    .some(el => el.textContent === hydration + '%');
-  if (existing) return;
-
-  const btn = document.createElement('button');
-  btn.type = 'button';
-  btn.className = 'hydration-btn hydration-btn--flour';
-  btn.setAttribute('onclick', 'setDoughHydration(' + hydration + ')');
-  const label = document.createElement('span');
-  label.className = 'hydration-label';
-  label.textContent = hydration + '%';
-  const ratio = document.createElement('span');
-  ratio.className = 'hydration-ratio';
-  ratio.textContent = reduceRatio(100, hydration) + ' flour:water';
-  const desc = document.createElement('span');
-  desc.className = 'hydration-desc';
-  desc.textContent = 'For ' + flourLabel;
-  btn.appendChild(label);
-  btn.appendChild(ratio);
-  btn.appendChild(desc);
-  group.appendChild(btn);
-}
-
-function reduceRatio(a, b) {
-  const gcd = (x, y) => y === 0 ? x : gcd(y, x % y);
-  const g = gcd(Math.round(a), Math.round(b));
-  return (a / g) + ':' + (b / g);
 }
 
 function setBreadStarterHydration(value) {
