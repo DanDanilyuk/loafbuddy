@@ -1,8 +1,8 @@
-# Sourdough Calculator
+# Loaf Buddy
 
-A static, no-nonsense sourdough calculator for starter feedings and bread recipe formulation. Does the baker's percentage math so you don't have to.
+Loaf Buddy is a static, no-nonsense sourdough calculator for starter feedings and bread recipe formulation. Does the baker's percentage math so you don't have to.
 
-Live site: <https://dandanilyuk.github.io/sourdough_calculator/>
+Live site: <https://www.loafbuddy.com>
 
 ## Features
 
