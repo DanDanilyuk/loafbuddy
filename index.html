@@ -36,37 +36,38 @@
         <div class="input-group">
           <label>When do you want your starter ready?</label>
           <div class="time-buttons">
-            <button class="time-btn active" onclick="setReadyTime(1, 1, 1)">
+            <button class="time-btn active" data-ratio-starter="1" data-ratio-flour="1" onclick="setReadyTime(1, 1, 1)">
               <span class="time-label">4-6 hours</span>
               <span class="time-ratio">1:1:1 ratio</span>
               <span class="time-desc">Quick feed</span>
             </button>
-            <button class="time-btn" onclick="setReadyTime(1, 2, 2)">
+            <button class="time-btn" data-ratio-starter="1" data-ratio-flour="2" onclick="setReadyTime(1, 2, 2)">
               <span class="time-label">6-8 hours</span>
               <span class="time-ratio">1:2:2 ratio</span>
               <span class="time-desc">Morning bake</span>
             </button>
-            <button class="time-btn" onclick="setReadyTime(1, 3, 3)">
+            <button class="time-btn" data-ratio-starter="1" data-ratio-flour="3" onclick="setReadyTime(1, 3, 3)">
               <span class="time-label">8-10 hours</span>
               <span class="time-ratio">1:3:3 ratio</span>
               <span class="time-desc">Before work</span>
             </button>
-            <button class="time-btn" onclick="setReadyTime(1, 4, 4)">
+            <button class="time-btn" data-ratio-starter="1" data-ratio-flour="4" onclick="setReadyTime(1, 4, 4)">
               <span class="time-label">10-12 hours</span>
               <span class="time-ratio">1:4:4 ratio</span>
               <span class="time-desc">Overnight</span>
             </button>
-            <button class="time-btn" onclick="setReadyTime(1, 5, 5)">
+            <button class="time-btn" data-ratio-starter="1" data-ratio-flour="5" onclick="setReadyTime(1, 5, 5)">
               <span class="time-label">12-14 hours</span>
               <span class="time-ratio">1:5:5 ratio</span>
               <span class="time-desc">Full day</span>
             </button>
-            <button class="time-btn" onclick="setReadyTime(1, 10, 10)">
+            <button class="time-btn" data-ratio-starter="1" data-ratio-flour="10" onclick="setReadyTime(1, 10, 10)">
               <span class="time-label">16-24 hours</span>
               <span class="time-ratio">1:10:10 ratio</span>
               <span class="time-desc">Max flavor</span>
             </button>
           </div>
+          <div class="info-text">Water scales with your starter's hydration, so ratios update as you adjust it.</div>
           <div class="info-text">Times assume room temp around 75°F (24°C)</div>
         </div>
 

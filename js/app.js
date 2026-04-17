@@ -55,15 +55,30 @@ function setReadyTime(ratioStarter, ratioFlour, ratioWater) {
   document.getElementById('feedingRatioFlour').value = ratioFlour;
   document.getElementById('feedingRatioWater').value = ratioWater;
 
-  const ratioText = ratioStarter + ':' + ratioFlour + ':' + ratioWater + ' ratio';
-  setActiveButton('.time-btn', '.time-ratio', ratioText);
+  document.querySelectorAll('.time-btn').forEach(btn => {
+    const isMatch = parseFloat(btn.dataset.ratioStarter) === ratioStarter &&
+                    parseFloat(btn.dataset.ratioFlour) === ratioFlour;
+    btn.classList.toggle('active', isMatch);
+  });
 
   calculateStarter();
+}
+
+function updateRatioLabels() {
+  const hydration = getInputValue('hydration', 100);
+  document.querySelectorAll('.time-btn').forEach(btn => {
+    const s = parseFloat(btn.dataset.ratioStarter);
+    const f = parseFloat(btn.dataset.ratioFlour);
+    const w = f * (hydration / 100);
+    const wText = Number(w.toFixed(2)).toString();
+    btn.querySelector('.time-ratio').textContent = s + ':' + f + ':' + wText + ' ratio';
+  });
 }
 
 function setStarterHydration(value) {
   document.getElementById('hydration').value = value;
   setActiveButton('#section-starter .hydration-buttons .hydration-btn', '.hydration-label', value + '%');
+  updateRatioLabels();
   calculateStarter();
 }
 
@@ -192,5 +207,6 @@ function calculateBread() {
 // Initialize
 // ---------------------------------------------------------------------------
 
+updateRatioLabels();
 calculateStarter();
 calculateBread();
