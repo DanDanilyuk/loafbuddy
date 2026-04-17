@@ -1,6 +1,156 @@
 'use strict';
 
 // ---------------------------------------------------------------------------
+// URL Hash State - shareable bookmarkable URLs
+// ---------------------------------------------------------------------------
+
+const HASH_DEFAULTS = {
+  rs: 1, rf: 1, h: 75, cw: 0, cs: 50,
+  d: 900, sp: 20, sh: 75, dh: 75, salt: 2, ft: 'bread'
+};
+
+const FLOUR_LABEL_TO_TYPE = {
+  'All-Purpose': 'ap',
+  'Bread Flour': 'bread',
+  'Whole Wheat': 'ww',
+  'Rye': 'rye',
+  'Spelt': 'spelt',
+  'Mixed': 'mix'
+};
+
+const VALID_FLOUR_TYPES = ['ap', 'bread', 'ww', 'rye', 'spelt', 'mix'];
+
+let suppressHashWrite = true;
+
+function getActiveFlourType() {
+  const active = document.querySelector('.flour-btn.active .flour-label');
+  if (!active) return HASH_DEFAULTS.ft;
+  return FLOUR_LABEL_TO_TYPE[active.textContent] || HASH_DEFAULTS.ft;
+}
+
+function setIfNonDefault(params, key, value) {
+  if (value === undefined || value === null) return;
+  if (typeof value === 'number' && isNaN(value)) return;
+  if (value !== HASH_DEFAULTS[key]) params.set(key, String(value));
+}
+
+function writeHashState() {
+  if (suppressHashWrite) return;
+
+  const isStarterActive = document.getElementById('tab-starter').classList.contains('active');
+  const tab = isStarterActive ? 's' : 'b';
+  const params = new URLSearchParams();
+
+  if (isStarterActive) {
+    setIfNonDefault(params, 'rs', parseFloat(document.getElementById('feedingRatioStarter').value));
+    setIfNonDefault(params, 'rf', parseFloat(document.getElementById('feedingRatioFlour').value));
+    setIfNonDefault(params, 'h', parseFloat(document.getElementById('hydration').value));
+    setIfNonDefault(params, 'cw', parseFloat(document.getElementById('containerWeightStarter').value));
+    setIfNonDefault(params, 'cs', parseFloat(document.getElementById('currentStarter').value));
+  } else {
+    setIfNonDefault(params, 'd', parseFloat(document.getElementById('targetDoughWeight').value));
+    setIfNonDefault(params, 'sp', parseFloat(document.getElementById('starterPercentage').value));
+    setIfNonDefault(params, 'sh', parseFloat(document.getElementById('starterHydration').value));
+    setIfNonDefault(params, 'dh', parseFloat(document.getElementById('doughHydration').value));
+    setIfNonDefault(params, 'salt', parseFloat(document.getElementById('saltPercent').value));
+    setIfNonDefault(params, 'ft', getActiveFlourType());
+  }
+
+  const qs = params.toString();
+  const hasParams = qs.length > 0;
+  const allDefault = !hasParams && isStarterActive;
+
+  let newUrl;
+  if (allDefault) {
+    newUrl = location.pathname + location.search;
+  } else {
+    const newHash = hasParams ? '#' + tab + '?' + qs : '#' + tab;
+    newUrl = location.pathname + location.search + newHash;
+  }
+
+  if ((location.pathname + location.search + location.hash) !== newUrl) {
+    history.replaceState(null, '', newUrl);
+  }
+}
+
+function applyHashState() {
+  const hash = location.hash.slice(1);
+  if (!hash) return;
+
+  try {
+    const qIndex = hash.indexOf('?');
+    const tab = qIndex === -1 ? hash : hash.slice(0, qIndex);
+    const qs = qIndex === -1 ? '' : hash.slice(qIndex + 1);
+    const params = new URLSearchParams(qs);
+
+    suppressHashWrite = true;
+    try {
+      if (tab === 'b') {
+        showTab('bread');
+
+        if (params.has('ft')) {
+          const ft = params.get('ft');
+          if (VALID_FLOUR_TYPES.indexOf(ft) !== -1) {
+            setFlourType(ft, null);
+          }
+        }
+        if (params.has('d')) {
+          const d = parseFloat(params.get('d'));
+          if (!isNaN(d) && d > 0) setDoughWeight(d);
+        }
+        if (params.has('sp')) {
+          const sp = parseFloat(params.get('sp'));
+          if (!isNaN(sp)) setStarterPercentage(sp);
+        }
+        if (params.has('sh')) {
+          const sh = parseFloat(params.get('sh'));
+          if (!isNaN(sh)) setBreadStarterHydration(sh);
+        }
+        if (params.has('dh')) {
+          const dh = parseFloat(params.get('dh'));
+          if (!isNaN(dh)) setDoughHydration(dh);
+        }
+        if (params.has('salt')) {
+          const salt = parseFloat(params.get('salt'));
+          if (!isNaN(salt)) document.getElementById('saltPercent').value = salt;
+        }
+        calculateBread();
+      } else if (tab === 's') {
+        showTab('starter');
+
+        const hasRs = params.has('rs');
+        const hasRf = params.has('rf');
+        if (hasRs || hasRf) {
+          const rs = hasRs ? parseFloat(params.get('rs')) : HASH_DEFAULTS.rs;
+          const rf = hasRf ? parseFloat(params.get('rf')) : HASH_DEFAULTS.rf;
+          if (!isNaN(rs) && !isNaN(rf)) setReadyTime(rs, rf, rs);
+        }
+        if (params.has('h')) {
+          const h = parseFloat(params.get('h'));
+          if (!isNaN(h)) setStarterHydration(h);
+        }
+        if (params.has('cw')) {
+          const cw = parseFloat(params.get('cw'));
+          if (!isNaN(cw)) document.getElementById('containerWeightStarter').value = cw;
+        }
+        if (params.has('cs')) {
+          const cs = parseFloat(params.get('cs'));
+          if (!isNaN(cs)) document.getElementById('currentStarter').value = cs;
+        }
+        calculateStarter();
+      }
+    } finally {
+      suppressHashWrite = false;
+    }
+
+    writeHashState();
+  } catch (e) {
+    suppressHashWrite = false;
+    console.warn('Failed to apply hash state:', e);
+  }
+}
+
+// ---------------------------------------------------------------------------
 // Utility
 // ---------------------------------------------------------------------------
 
@@ -51,6 +201,8 @@ function showTab(which) {
   tabBread.setAttribute('aria-selected', String(!isStarter));
   tabStarter.setAttribute('tabindex', isStarter ? '0' : '-1');
   tabBread.setAttribute('tabindex', isStarter ? '-1' : '0');
+
+  writeHashState();
 }
 
 function handleTablistKeydown(event) {
@@ -252,6 +404,8 @@ function calculateStarter() {
   displayGrams('flourToAdd', flourToAdd);
   displayGrams('waterToAdd', waterToAdd);
   displayGrams('totalWeight', totalWeight);
+
+  writeHashState();
 }
 
 // ---------------------------------------------------------------------------
@@ -307,6 +461,8 @@ function calculateBread() {
   displayGramsWithPct('additionalWater', waterToAdd, doughHydration);
   displayGramsWithPct('salt', salt, saltPercent);
   displayGrams('totalDough', clamp(starterWeight) + clamp(flourToAdd) + clamp(waterToAdd) + clamp(salt));
+
+  writeHashState();
 }
 
 // ---------------------------------------------------------------------------
@@ -317,3 +473,6 @@ updateRatioLabels();
 calculateStarter();
 calculateBread();
 document.querySelector('.tabs').addEventListener('keydown', handleTablistKeydown);
+
+suppressHashWrite = false;
+applyHashState();
