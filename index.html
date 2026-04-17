@@ -91,13 +91,6 @@
         </div>
 
         <div class="input-group">
-          <label for="starterToFeed">Starter to Feed (g):</label>
-          <input type="number" id="starterToFeed" min="0" step="1" placeholder="e.g. 10 - leave blank to feed all" oninput="calculateStarter()" aria-describedby="starterToFeedHint starterToFeedWarning">
-          <div class="info-text" id="starterToFeedHint">Leave blank to feed all your starter, or enter less to discard the rest first.</div>
-          <div class="info-text warning hidden" id="starterToFeedWarning" role="alert">That's more than you have, so we're feeding all of it.</div>
-        </div>
-
-        <div class="input-group">
           <div id="label-starter-hydration" class="group-label">Hydration:</div>
           <div class="hydration-buttons" role="group" aria-labelledby="label-starter-hydration">
             <button class="hydration-btn" onclick="setStarterHydration(50)">
@@ -131,10 +124,6 @@
           <div class="result-item">
             <span class="result-label">Your Starter:</span>
             <span class="result-value" id="starterToUse">50.0 g</span>
-          </div>
-          <div class="result-item hidden" id="discardRow">
-            <span class="result-label">Discard:</span>
-            <span class="result-value" id="discardAmount">0.0 g</span>
           </div>
           <div class="result-item">
             <span class="result-label">Flour to Add:</span>

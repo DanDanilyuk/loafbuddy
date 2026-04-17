@@ -40,7 +40,6 @@ function hasAnyCustomizations() {
   if (parseFloat(document.getElementById('hydration').value) !== HASH_DEFAULTS.h) return true;
   if (getNonNegativeInputValue('containerWeightStarter', 0) !== HASH_DEFAULTS.cw) return true;
   if (getNonNegativeInputValue('currentStarter', 0) !== HASH_DEFAULTS.cs) return true;
-  if (document.getElementById('starterToFeed').value !== '') return true;
 
   if (getNonNegativeInputValue('targetDoughWeight', 900) !== HASH_DEFAULTS.d) return true;
   if (parseFloat(document.getElementById('starterPercentage').value) !== HASH_DEFAULTS.sp) return true;
@@ -383,7 +382,6 @@ function setStarterPercentage(percent) {
 function resetCalculator() {
   document.getElementById('containerWeightStarter').value = 0;
   document.getElementById('currentStarter').value = 50;
-  document.getElementById('starterToFeed').value = '';
   document.getElementById('saltPercent').value = 2;
 
   setReadyTime(1, 1, 1);
@@ -397,7 +395,7 @@ function resetCalculator() {
   setBreadStarterHydration(75);
   setDoughHydration(75);
 
-  ['saltWarning', 'starterContainerWarning', 'starterToFeedWarning',
+  ['saltWarning', 'starterContainerWarning',
    'breadInfeasibleWarning', 'mixedFlourHint'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.classList.add('hidden');
@@ -423,15 +421,7 @@ function calculateStarter() {
   // Water ratio derived from flour ratio and target hydration
   const ratioWater = ratioFlour * (hydration / 100);
 
-  const available = Math.max(0, currentStarterTotal - containerWeight);
-
-  const keepRaw = parseFloat(document.getElementById('starterToFeed').value);
-  const keepTyped = !isNaN(keepRaw) && keepRaw > 0;
-  const keepOverflow = keepTyped && keepRaw > available && available > 0;
-  const keep = keepTyped && keepRaw < available ? keepRaw : available;
-  const discard = available - keep;
-
-  const starterToUse = keep;
+  const starterToUse = Math.max(0, currentStarterTotal - containerWeight);
   const flourToAdd = starterToUse * (ratioFlour / ratioStarter);
   const waterToAdd = starterToUse * (ratioWater / ratioStarter);
 
@@ -439,11 +429,8 @@ function calculateStarter() {
   const totalWeight = showWarning ? 0 : clamp(starterToUse) + clamp(flourToAdd) + clamp(waterToAdd) + clamp(containerWeight);
 
   document.getElementById('starterContainerWarning').classList.toggle('hidden', !showWarning);
-  document.getElementById('starterToFeedWarning').classList.toggle('hidden', showWarning || !keepOverflow);
-  document.getElementById('discardRow').classList.toggle('hidden', showWarning || discard <= 0);
 
   displayGrams('starterToUse', starterToUse);
-  displayGrams('discardAmount', discard);
   displayGrams('flourToAdd', flourToAdd);
   displayGrams('waterToAdd', waterToAdd);
   displayGrams('totalWeight', totalWeight);
