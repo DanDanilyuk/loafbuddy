@@ -18,8 +18,12 @@ function getInputValue(id, fallback) {
   return parseFloat(document.getElementById(id).value) || fallback;
 }
 
+function clamp(value) {
+  return Math.max(0, value);
+}
+
 function displayGrams(id, value) {
-  document.getElementById(id).textContent = Math.max(0, value).toFixed(1) + ' g';
+  document.getElementById(id).textContent = clamp(value).toFixed(1) + ' g';
 }
 
 // ---------------------------------------------------------------------------
@@ -132,7 +136,7 @@ function calculateStarter() {
   const waterToAdd = starterToUse * (ratioWater / ratioStarter);
 
   const showWarning = containerWeight > 0 && currentStarterTotal > 0 && currentStarterTotal <= containerWeight;
-  const totalWeight = showWarning ? 0 : starterToUse + flourToAdd + waterToAdd + containerWeight;
+  const totalWeight = showWarning ? 0 : clamp(starterToUse) + clamp(flourToAdd) + clamp(waterToAdd) + clamp(containerWeight);
 
   document.getElementById('starterContainerWarning').classList.toggle('hidden', !showWarning);
 
@@ -181,7 +185,7 @@ function calculateBread() {
   displayGrams('additionalFlour', flourToAdd);
   displayGrams('additionalWater', waterToAdd);
   displayGrams('salt', salt);
-  displayGrams('totalDough', starterWeight + flourToAdd + waterToAdd + salt);
+  displayGrams('totalDough', clamp(starterWeight) + clamp(flourToAdd) + clamp(waterToAdd) + clamp(salt));
 }
 
 // ---------------------------------------------------------------------------
