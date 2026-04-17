@@ -34,7 +34,32 @@ function setIfNonDefault(params, key, value) {
   if (value !== HASH_DEFAULTS[key]) params.set(key, String(value));
 }
 
+function hasAnyCustomizations() {
+  if (parseFloat(document.getElementById('feedingRatioStarter').value) !== HASH_DEFAULTS.rs) return true;
+  if (parseFloat(document.getElementById('feedingRatioFlour').value) !== HASH_DEFAULTS.rf) return true;
+  if (parseFloat(document.getElementById('hydration').value) !== HASH_DEFAULTS.h) return true;
+  if (getNonNegativeInputValue('containerWeightStarter', 0) !== HASH_DEFAULTS.cw) return true;
+  if (getNonNegativeInputValue('currentStarter', 0) !== HASH_DEFAULTS.cs) return true;
+  if (document.getElementById('starterToFeed').value !== '') return true;
+
+  if (getNonNegativeInputValue('targetDoughWeight', 900) !== HASH_DEFAULTS.d) return true;
+  if (parseFloat(document.getElementById('starterPercentage').value) !== HASH_DEFAULTS.sp) return true;
+  if (parseFloat(document.getElementById('starterHydration').value) !== HASH_DEFAULTS.sh) return true;
+  if (parseFloat(document.getElementById('doughHydration').value) !== HASH_DEFAULTS.dh) return true;
+  if (parseFloat(document.getElementById('saltPercent').value) !== HASH_DEFAULTS.salt) return true;
+  if (getActiveFlourType() !== HASH_DEFAULTS.ft) return true;
+
+  return false;
+}
+
+function updateResetVisibility() {
+  const btn = document.querySelector('.reset-btn');
+  if (!btn) return;
+  btn.classList.toggle('hidden', !hasAnyCustomizations());
+}
+
 function writeHashState() {
+  updateResetVisibility();
   if (suppressHashWrite) return;
 
   const isStarterActive = document.getElementById('tab-starter').classList.contains('active');
