@@ -170,14 +170,22 @@ input[type="number"]:focus {
 .weight-buttons,
 .starter-pct-buttons {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
   gap: 10px;
   margin-top: 10px;
 }
 
+.weight-buttons {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.hydration-buttons,
+.starter-hydration-buttons,
+.dough-hydration-buttons {
+  grid-template-columns: repeat(4, 1fr);
+}
+
 .starter-pct-buttons {
   grid-template-columns: repeat(3, 1fr);
-  /* 3 columns for starter percentage */
 }
 
 
