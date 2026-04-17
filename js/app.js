@@ -53,7 +53,6 @@ function showTab(which) {
 function setReadyTime(ratioStarter, ratioFlour, ratioWater) {
   document.getElementById('feedingRatioStarter').value = ratioStarter;
   document.getElementById('feedingRatioFlour').value = ratioFlour;
-  document.getElementById('feedingRatioWater').value = ratioWater;
 
   document.querySelectorAll('.time-btn').forEach(btn => {
     const isMatch = parseFloat(btn.dataset.ratioStarter) === ratioStarter &&
