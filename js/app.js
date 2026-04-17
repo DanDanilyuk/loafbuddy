@@ -181,6 +181,28 @@ function displayGramsWithPct(id, grams, percent) {
   document.getElementById(id).textContent = clamp(grams).toFixed(1) + ' g \u00B7 ' + pctText + '%';
 }
 
+function updatePrintTitle() {
+  const titleEl = document.getElementById('printTitle');
+  if (!titleEl) return;
+
+  const isStarterActive = document.getElementById('tab-starter').classList.contains('active');
+
+  if (isStarterActive) {
+    const rs = getInputValue('feedingRatioStarter', 1);
+    const rf = getInputValue('feedingRatioFlour', 1);
+    const h = getInputValue('hydration', 75);
+    const rw = rf * (h / 100);
+    const rwText = Number(rw.toFixed(2)).toString();
+    titleEl.textContent = 'Starter Feeding - ' + rs + ':' + rf + ':' + rwText + ' ratio, ' + h + '% hydration';
+  } else {
+    const d = getInputValue('targetDoughWeight', 900);
+    const dh = getInputValue('doughHydration', 75);
+    const flourLabel = document.querySelector('.flour-btn.active .flour-label');
+    const flourText = flourLabel ? flourLabel.textContent : 'Bread Flour';
+    titleEl.textContent = 'Sourdough Recipe - ' + d + ' g, ' + flourText + ', ' + dh + '% hydration';
+  }
+}
+
 // ---------------------------------------------------------------------------
 // Tab Navigation
 // ---------------------------------------------------------------------------
@@ -203,6 +225,7 @@ function showTab(which) {
   tabBread.setAttribute('tabindex', isStarter ? '-1' : '0');
 
   writeHashState();
+  updatePrintTitle();
 }
 
 function handleTablistKeydown(event) {
@@ -406,6 +429,7 @@ function calculateStarter() {
   displayGrams('totalWeight', totalWeight);
 
   writeHashState();
+  updatePrintTitle();
 }
 
 // ---------------------------------------------------------------------------
@@ -463,6 +487,7 @@ function calculateBread() {
   displayGrams('totalDough', clamp(starterWeight) + clamp(flourToAdd) + clamp(waterToAdd) + clamp(salt));
 
   writeHashState();
+  updatePrintTitle();
 }
 
 // ---------------------------------------------------------------------------
