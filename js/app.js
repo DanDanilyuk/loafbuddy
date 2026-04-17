@@ -140,18 +140,23 @@ function setDoughHydration(value) {
 
 function setDoughWeight(weight) {
   setActiveButton('.weight-btn', '.hydration-desc', weight + 'g');
-  document.getElementById('customWeightContainer').classList.add('hidden');
   document.getElementById('targetDoughWeight').value = weight;
   calculateBread();
 }
 
 function toggleCustomWeight() {
   setActiveButton('.weight-btn', '.hydration-label', 'Custom');
-  document.getElementById('customWeightContainer').classList.remove('hidden');
 
   const input = document.getElementById('targetDoughWeight');
   input.focus();
   input.select();
+}
+
+function handleCustomWeightKeydown(event) {
+  if (event.key === 'Enter' || event.key === ' ') {
+    event.preventDefault();
+    toggleCustomWeight();
+  }
 }
 
 function setStarterPercentage(percent) {

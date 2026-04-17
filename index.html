@@ -166,16 +166,16 @@
               <span class="hydration-label">Two Loaves</span>
               <span class="hydration-desc">1800g</span>
             </button>
-            <button class="weight-btn" onclick="toggleCustomWeight()">
-              <span class="hydration-label">Custom</span>
-              <span class="hydration-desc">Enter your own</span>
-            </button>
-          </div>
-
-          <!-- Custom Input Field (Hidden by default) -->
-          <div id="customWeightContainer" class="hidden" style="margin-top: 10px;">
-            <label for="targetDoughWeight" style="font-size: 0.9em;">Enter Weight (g):</label>
-            <input type="number" id="targetDoughWeight" value="900" min="1" step="1" oninput="calculateBread()">
+            <div class="weight-btn weight-btn--custom" id="customWeightBtn" role="button" tabindex="0" onclick="toggleCustomWeight()" onkeydown="handleCustomWeightKeydown(event)">
+              <span class="weight-btn-label">
+                <span class="hydration-label">Custom</span>
+                <span class="hydration-desc">Enter your own</span>
+              </span>
+              <div id="customWeightContainer" class="weight-btn-input">
+                <label for="targetDoughWeight" class="sr-only">Custom dough weight in grams</label>
+                <input type="number" id="targetDoughWeight" value="900" min="1" step="1" oninput="calculateBread()" onclick="event.stopPropagation()">
+              </div>
+            </div>
           </div>
         </div>
 
