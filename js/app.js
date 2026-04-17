@@ -180,11 +180,6 @@ function displayGrams(id, value) {
   document.getElementById(id).textContent = clamp(value).toFixed(1) + ' g';
 }
 
-function displayGramsWithPct(id, grams, percent) {
-  const pctText = Number(percent.toFixed(1)).toString();
-  document.getElementById(id).textContent = clamp(grams).toFixed(1) + ' g \u00B7 ' + pctText + '%';
-}
-
 function updatePrintTitle() {
   const titleEl = document.getElementById('printTitle');
   if (!titleEl) return;
@@ -484,10 +479,10 @@ function calculateBread() {
     breadInfeasibleWarning.classList.toggle('hidden', !(negativeFlour || negativeWater));
   }
 
-  displayGramsWithPct('netStarter', starterWeight, starterPercentage);
-  displayGramsWithPct('additionalFlour', flourToAdd, 100);
-  displayGramsWithPct('additionalWater', waterToAdd, doughHydration);
-  displayGramsWithPct('salt', salt, saltPercent);
+  displayGrams('netStarter', starterWeight);
+  displayGrams('additionalFlour', flourToAdd);
+  displayGrams('additionalWater', waterToAdd);
+  displayGrams('salt', salt);
   displayGrams('totalDough', clamp(starterWeight) + clamp(flourToAdd) + clamp(waterToAdd) + clamp(salt));
 
   writeHashState();
