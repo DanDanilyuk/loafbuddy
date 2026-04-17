@@ -86,8 +86,6 @@ function setStarterHydration(value) {
 // ---------------------------------------------------------------------------
 
 function setFlourType(type, recommendedHydration) {
-  document.getElementById('flourType').value = type;
-
   const labels = { ap: 'All-Purpose', bread: 'Bread Flour', ww: 'Whole Wheat', rye: 'Rye', spelt: 'Spelt', mix: 'Mixed' };
   setActiveButton('.flour-btn', '.flour-label', labels[type]);
 
