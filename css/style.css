@@ -3,6 +3,7 @@
   --brand-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   --brand-primary: #667eea;
   --brand-shadow: rgba(102, 126, 234, 0.3);
+  --warning-color: #b45309;
 }
 
 * {
@@ -286,6 +287,11 @@ input[type="number"]:focus {
   margin-top: 5px;
 }
 
+.info-text.warning {
+  color: var(--warning-color);
+  font-weight: 500;
+}
+
 .hydration-btn:focus-visible,
 .flour-btn:focus-visible,
 .time-btn:focus-visible,
@@ -365,6 +371,10 @@ footer p {
   .time-desc,
   .time-ratio {
     color: #9ca3af;
+  }
+
+  .info-text.warning {
+    color: #fbbf24;
   }
 
   .results {

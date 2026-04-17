@@ -1,0 +1,4 @@
+TASK_LIST.md
+.playwright-mcp/
+salt-*.png
+webapp-check-*.png

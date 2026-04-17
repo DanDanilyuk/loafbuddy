@@ -147,7 +147,14 @@ function calculateBread() {
   const starterPercentage = getInputValue('starterPercentage', 20);
   const starterHydration = getInputValue('starterHydration', 100);
   const doughHydration = getInputValue('doughHydration', 75);
-  const saltPercent = getInputValue('saltPercent', 2);
+  const rawSaltPercent = getInputValue('saltPercent', 2);
+  const saltPercent = Math.min(10, Math.max(0, rawSaltPercent));
+
+  const saltInput = document.getElementById('saltPercent');
+  const saltWarning = document.getElementById('saltWarning');
+  const typedValue = parseFloat(saltInput.value);
+  const outOfRange = !isNaN(typedValue) && (typedValue < 0 || typedValue > 10);
+  saltWarning.classList.toggle('hidden', !outOfRange);
 
   // Total flour from Baker's Percentage:
   // Dough = Flour + Water + Salt = Flour * (1 + hydration% + salt%)
