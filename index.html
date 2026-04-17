@@ -229,6 +229,9 @@
               <span class="flour-desc">Set hydration manually</span>
             </button>
           </div>
+          <div class="info-text hidden" id="mixedFlourHint">
+            <span>Pick a dough hydration below; 75% is a solid starting point.</span>
+          </div>
         </div>
 
         <div class="input-group">
@@ -258,7 +261,7 @@
           <input type="hidden" id="starterHydration" value="75">
         </div>
 
-        <div class="input-group">
+        <div class="input-group" id="doughHydrationGroup">
           <div id="label-dough-hydration" class="group-label">How wet do you want your dough?</div>
           <div class="dough-hydration-buttons" role="group" aria-labelledby="label-dough-hydration">
             <button class="hydration-btn" onclick="setDoughHydration(65)">

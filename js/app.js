@@ -111,6 +111,12 @@ function setFlourType(type, recommendedHydration) {
   const labels = { ap: 'All-Purpose', bread: 'Bread Flour', ww: 'Whole Wheat', rye: 'Rye', spelt: 'Spelt', mix: 'Mixed' };
   setActiveButton('.flour-btn', '.flour-label', labels[type]);
 
+  const mixedHint = document.getElementById('mixedFlourHint');
+  const doughHydrationGroup = document.getElementById('doughHydrationGroup');
+  const isMixed = type === 'mix';
+  if (mixedHint) mixedHint.classList.toggle('hidden', !isMixed);
+  if (doughHydrationGroup) doughHydrationGroup.classList.toggle('needs-attention', isMixed);
+
   if (recommendedHydration !== null) {
     setDoughHydration(recommendedHydration);
   } else {
@@ -127,6 +133,8 @@ function setBreadStarterHydration(value) {
 function setDoughHydration(value) {
   document.getElementById('doughHydration').value = value;
   setActiveButton('.dough-hydration-buttons .hydration-btn', '.hydration-label', value + '%');
+  const doughHydrationGroup = document.getElementById('doughHydrationGroup');
+  if (doughHydrationGroup) doughHydrationGroup.classList.remove('needs-attention');
   calculateBread();
 }
 
