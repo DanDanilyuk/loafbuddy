@@ -48,15 +48,46 @@ header h1 {
   width: 100%;
 }
 
+.tab-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 25px;
+}
+
 .tabs {
   display: flex;
   border-radius: 999px;
   background: #e2e8f0;
   padding: 4px;
-  margin-bottom: 25px;
   max-width: 420px;
-  margin-left: auto;
-  margin-right: auto;
+  width: 100%;
+}
+
+.reset-btn {
+  background: transparent;
+  border: none;
+  padding: 6px 10px;
+  color: #7f8c8d;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: color 0.2s, background 0.2s;
+}
+
+@media (hover: hover) {
+  .reset-btn:hover {
+    color: var(--brand-primary);
+    background: rgba(102, 126, 234, 0.08);
+  }
+}
+
+.reset-btn:focus-visible {
+  outline: 2px solid var(--brand-primary);
+  outline-offset: 2px;
 }
 
 .tab-btn {
@@ -572,6 +603,17 @@ footer p {
   @media (hover: hover) {
     .secondary-btn:hover {
       color: #c7d2fe;
+    }
+  }
+
+  .reset-btn {
+    color: #9ca3af;
+  }
+
+  @media (hover: hover) {
+    .reset-btn:hover {
+      color: #a3bffa;
+      background: rgba(102, 126, 234, 0.15);
     }
   }
 }

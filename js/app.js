@@ -182,6 +182,39 @@ function setStarterPercentage(percent) {
 }
 
 // ---------------------------------------------------------------------------
+// Reset
+// ---------------------------------------------------------------------------
+
+function resetCalculator() {
+  document.getElementById('containerWeightStarter').value = 0;
+  document.getElementById('currentStarter').value = 50;
+  document.getElementById('starterToFeed').value = '';
+  document.getElementById('saltPercent').value = 2;
+
+  setReadyTime(1, 1, 1);
+  setStarterHydration(75);
+
+  const customBtn = document.getElementById('customWeightBtn');
+  if (customBtn) customBtn.classList.remove('active');
+  setDoughWeight(900);
+  setStarterPercentage(20);
+  setFlourType('bread', 75);
+  setBreadStarterHydration(75);
+  setDoughHydration(75);
+
+  ['saltWarning', 'starterContainerWarning', 'starterToFeedWarning',
+   'breadInfeasibleWarning', 'mixedFlourHint'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.add('hidden');
+  });
+  const doughHydrationGroup = document.getElementById('doughHydrationGroup');
+  if (doughHydrationGroup) doughHydrationGroup.classList.remove('needs-attention');
+
+  calculateStarter();
+  calculateBread();
+}
+
+// ---------------------------------------------------------------------------
 // Starter Feeding - Calculation
 // ---------------------------------------------------------------------------
 
