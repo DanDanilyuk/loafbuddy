@@ -472,8 +472,9 @@ input[type="number"]:focus::-webkit-outer-spin-button {
 footer {
   background: #2d3748;
   color: white;
-  padding: 30px;
+  padding: 14px 20px;
   text-align: center;
+  font-size: 0.9em;
 }
 
 footer a {
@@ -486,7 +487,7 @@ footer a:hover {
 }
 
 footer p {
-  margin: 5px 0;
+  margin: 2px 0;
 }
 
 @media (max-width: 768px) {
