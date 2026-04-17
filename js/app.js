@@ -64,7 +64,7 @@ function setReadyTime(ratioStarter, ratioFlour, ratioWater) {
 }
 
 function updateRatioLabels() {
-  const hydration = getInputValue('hydration', 100);
+  const hydration = getInputValue('hydration', 75);
   document.querySelectorAll('.time-btn').forEach(btn => {
     const s = parseFloat(btn.dataset.ratioStarter);
     const f = parseFloat(btn.dataset.ratioFlour);
@@ -135,7 +135,7 @@ function setStarterPercentage(percent) {
 function calculateStarter() {
   const containerWeight = getInputValue('containerWeightStarter', 0);
   const currentStarterTotal = getInputValue('currentStarter', 0);
-  const hydration = getInputValue('hydration', 100);
+  const hydration = getInputValue('hydration', 75);
   const ratioStarter = getInputValue('feedingRatioStarter', 1);
   const ratioFlour = getInputValue('feedingRatioFlour', 1);
 
@@ -165,7 +165,7 @@ function calculateStarter() {
 function calculateBread() {
   const targetDoughWeight = getInputValue('targetDoughWeight', 0);
   const starterPercentage = getInputValue('starterPercentage', 20);
-  const starterHydration = getInputValue('starterHydration', 100);
+  const starterHydration = getInputValue('starterHydration', 75);
   const doughHydration = getInputValue('doughHydration', 75);
   const rawSaltPercent = getInputValue('saltPercent', 2);
   const saltPercent = Math.min(10, Math.max(0, rawSaltPercent));
