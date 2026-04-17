@@ -166,8 +166,15 @@ function calculateStarter() {
   // Water ratio derived from flour ratio and target hydration
   const ratioWater = ratioFlour * (hydration / 100);
 
-  // Net starter = what's in the jar minus the jar
-  const starterToUse = Math.max(0, currentStarterTotal - containerWeight);
+  const available = Math.max(0, currentStarterTotal - containerWeight);
+
+  const keepRaw = parseFloat(document.getElementById('starterToFeed').value);
+  const keepTyped = !isNaN(keepRaw) && keepRaw > 0;
+  const keepOverflow = keepTyped && keepRaw > available && available > 0;
+  const keep = keepTyped && keepRaw < available ? keepRaw : available;
+  const discard = available - keep;
+
+  const starterToUse = keep;
   const flourToAdd = starterToUse * (ratioFlour / ratioStarter);
   const waterToAdd = starterToUse * (ratioWater / ratioStarter);
 
@@ -175,8 +182,11 @@ function calculateStarter() {
   const totalWeight = showWarning ? 0 : clamp(starterToUse) + clamp(flourToAdd) + clamp(waterToAdd) + clamp(containerWeight);
 
   document.getElementById('starterContainerWarning').classList.toggle('hidden', !showWarning);
+  document.getElementById('starterToFeedWarning').classList.toggle('hidden', showWarning || !keepOverflow);
+  document.getElementById('discardRow').classList.toggle('hidden', showWarning || discard <= 0);
 
   displayGrams('starterToUse', starterToUse);
+  displayGrams('discardAmount', discard);
   displayGrams('flourToAdd', flourToAdd);
   displayGrams('waterToAdd', waterToAdd);
   displayGrams('totalWeight', totalWeight);
