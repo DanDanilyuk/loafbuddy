@@ -45,10 +45,10 @@ function writeHashState() {
     setIfNonDefault(params, 'rs', parseFloat(document.getElementById('feedingRatioStarter').value));
     setIfNonDefault(params, 'rf', parseFloat(document.getElementById('feedingRatioFlour').value));
     setIfNonDefault(params, 'h', parseFloat(document.getElementById('hydration').value));
-    setIfNonDefault(params, 'cw', parseFloat(document.getElementById('containerWeightStarter').value));
-    setIfNonDefault(params, 'cs', parseFloat(document.getElementById('currentStarter').value));
+    setIfNonDefault(params, 'cw', getNonNegativeInputValue('containerWeightStarter', 0));
+    setIfNonDefault(params, 'cs', getNonNegativeInputValue('currentStarter', 0));
   } else {
-    setIfNonDefault(params, 'd', parseFloat(document.getElementById('targetDoughWeight').value));
+    setIfNonDefault(params, 'd', getNonNegativeInputValue('targetDoughWeight', 900));
     setIfNonDefault(params, 'sp', parseFloat(document.getElementById('starterPercentage').value));
     setIfNonDefault(params, 'sh', parseFloat(document.getElementById('starterHydration').value));
     setIfNonDefault(params, 'dh', parseFloat(document.getElementById('doughHydration').value));
@@ -131,11 +131,11 @@ function applyHashState() {
         }
         if (params.has('cw')) {
           const cw = parseFloat(params.get('cw'));
-          if (!isNaN(cw)) document.getElementById('containerWeightStarter').value = cw;
+          if (!isNaN(cw) && cw >= 0) document.getElementById('containerWeightStarter').value = cw;
         }
         if (params.has('cs')) {
           const cs = parseFloat(params.get('cs'));
-          if (!isNaN(cs)) document.getElementById('currentStarter').value = cs;
+          if (!isNaN(cs) && cs >= 0) document.getElementById('currentStarter').value = cs;
         }
         calculateStarter();
       }
@@ -166,6 +166,10 @@ function setActiveButton(selector, labelSelector, matchText) {
 
 function getInputValue(id, fallback) {
   return parseFloat(document.getElementById(id).value) || fallback;
+}
+
+function getNonNegativeInputValue(id, fallback) {
+  return Math.max(0, getInputValue(id, fallback));
 }
 
 function clamp(value) {
@@ -394,8 +398,8 @@ function resetCalculator() {
 // ---------------------------------------------------------------------------
 
 function calculateStarter() {
-  const containerWeight = getInputValue('containerWeightStarter', 0);
-  const currentStarterTotal = getInputValue('currentStarter', 0);
+  const containerWeight = getNonNegativeInputValue('containerWeightStarter', 0);
+  const currentStarterTotal = getNonNegativeInputValue('currentStarter', 0);
   const hydration = getInputValue('hydration', 75);
   const ratioStarter = getInputValue('feedingRatioStarter', 1);
   const ratioFlour = getInputValue('feedingRatioFlour', 1);
@@ -437,7 +441,7 @@ function calculateStarter() {
 // ---------------------------------------------------------------------------
 
 function calculateBread() {
-  const targetDoughWeight = getInputValue('targetDoughWeight', 0);
+  const targetDoughWeight = getNonNegativeInputValue('targetDoughWeight', 0);
   const starterPercentage = getInputValue('starterPercentage', 20);
   const starterHydration = getInputValue('starterHydration', 75);
   const doughHydration = getInputValue('doughHydration', 75);
