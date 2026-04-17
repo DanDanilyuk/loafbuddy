@@ -130,7 +130,11 @@ function calculateStarter() {
   const starterToUse = Math.max(0, currentStarterTotal - containerWeight);
   const flourToAdd = starterToUse * (ratioFlour / ratioStarter);
   const waterToAdd = starterToUse * (ratioWater / ratioStarter);
-  const totalWeight = starterToUse + flourToAdd + waterToAdd + containerWeight;
+
+  const showWarning = containerWeight > 0 && currentStarterTotal > 0 && currentStarterTotal <= containerWeight;
+  const totalWeight = showWarning ? 0 : starterToUse + flourToAdd + waterToAdd + containerWeight;
+
+  document.getElementById('starterContainerWarning').classList.toggle('hidden', !showWarning);
 
   displayGrams('starterToUse', starterToUse);
   displayGrams('flourToAdd', flourToAdd);

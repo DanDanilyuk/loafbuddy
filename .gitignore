@@ -1,4 +1,7 @@
 TASK_LIST.md
 .playwright-mcp/
-salt-*.png
+# Playwright screenshots should live in /tmp/{workdir}/playwright/, not here
+*-desktop.png
+*-mobile.png
+*-warning.png
 webapp-check-*.png

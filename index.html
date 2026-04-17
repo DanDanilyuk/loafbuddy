@@ -78,8 +78,9 @@
 
         <div class="input-group">
           <label for="currentStarter">Current Starter + Container (g):</label>
-          <input type="number" id="currentStarter" value="50" min="0" step="1" oninput="calculateStarter()" aria-describedby="currentStarterHint">
+          <input type="number" id="currentStarter" value="50" min="0" step="1" oninput="calculateStarter()" aria-describedby="currentStarterHint starterContainerWarning">
           <div class="info-text" id="currentStarterHint">Put your jar on the scale and enter what you see</div>
+          <div class="info-text warning hidden" id="starterContainerWarning" role="alert">That's lighter than the empty jar, so double-check the container weight.</div>
         </div>
 
         <div class="input-group">
