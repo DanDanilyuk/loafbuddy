@@ -103,6 +103,22 @@ function setStarterHydration(value) {
   calculateStarter();
 }
 
+function useStarterInRecipe() {
+  const hydration = getInputValue('hydration', 75);
+  const presets = [50, 75, 100, 125];
+  if (presets.indexOf(hydration) !== -1) {
+    setBreadStarterHydration(hydration);
+  } else {
+    document.getElementById('starterHydration').value = hydration;
+    calculateBread();
+  }
+  showTab('bread');
+  const breadSection = document.getElementById('section-bread');
+  if (breadSection) {
+    breadSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+}
+
 // ---------------------------------------------------------------------------
 // Bread Baking - UI Controls
 // ---------------------------------------------------------------------------

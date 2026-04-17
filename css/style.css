@@ -282,6 +282,32 @@ input[type="number"]:focus {
   color: white;
 }
 
+.secondary-btn {
+  display: block;
+  margin: 16px auto 0;
+  background: transparent;
+  border: none;
+  padding: 6px 4px;
+  color: var(--brand-primary);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: color 0.2s, background 0.2s;
+}
+
+@media (hover: hover) {
+  .secondary-btn:hover {
+    color: #4c51bf;
+    text-decoration: underline;
+  }
+}
+
+.secondary-btn:focus-visible {
+  outline: 2px solid var(--brand-primary);
+  outline-offset: 2px;
+}
+
 .info-text {
   font-size: 0.9em;
   color: #7f8c8d;
@@ -537,5 +563,15 @@ footer p {
 
   input[type="number"]:focus {
     box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+  }
+
+  .secondary-btn {
+    color: #a3bffa;
+  }
+
+  @media (hover: hover) {
+    .secondary-btn:hover {
+      color: #c7d2fe;
+    }
   }
 }
