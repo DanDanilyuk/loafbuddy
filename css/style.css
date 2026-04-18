@@ -50,11 +50,15 @@ header h1 {
 
 .tab-row {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 16px;
-  flex-wrap: wrap;
-  margin-bottom: 25px;
+  gap: 8px;
+  margin-bottom: 5px;
+}
+
+.reset-btn.hidden {
+  display: inline-block;
+  visibility: hidden;
 }
 
 .tabs {
@@ -511,16 +515,6 @@ footer p {
   .weight-buttons,
   .starter-pct-buttons {
     grid-template-columns: 1fr;
-  }
-
-  .reset-btn.hidden {
-    display: inline-block;
-    visibility: hidden;
-  }
-
-  .tab-row {
-    gap: 8px;
-    margin-bottom: 5px;
   }
 }
 
