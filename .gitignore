@@ -5,3 +5,10 @@ TASK_LIST.md
 *-mobile.png
 *-warning.png
 webapp-check-*.png
+
+# wrangler files
+.wrangler
+.dev.vars*
+!.dev.vars.example
+.env*
+!.env.example
