@@ -732,6 +732,20 @@ footer p {
     box-shadow: 0 4px 12px var(--brand-shadow);
   }
 
+  /* Descendant text (ratio/desc spans) gets an explicit gray color
+     above; re-inherit white when inside an active button. */
+  .hydration-btn.active .hydration-ratio,
+  .hydration-btn.active .hydration-desc,
+  .flour-btn.active .flour-desc,
+  .time-btn.active .time-ratio,
+  .time-btn.active .time-desc,
+  .weight-btn.active .hydration-ratio,
+  .weight-btn.active .hydration-desc,
+  .starter-pct-btn.active .hydration-ratio,
+  .starter-pct-btn.active .hydration-desc {
+    color: inherit;
+  }
+
   input[type="number"]:focus {
     box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
   }
