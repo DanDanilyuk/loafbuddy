@@ -143,7 +143,7 @@ function applyHashState() {
         if (hasRs || hasRf) {
           const rs = hasRs ? parseFloat(params.get('rs')) : HASH_DEFAULTS.rs;
           const rf = hasRf ? parseFloat(params.get('rf')) : HASH_DEFAULTS.rf;
-          if (!isNaN(rs) && !isNaN(rf)) setReadyTime(rs, rf, rs);
+          if (!isNaN(rs) && !isNaN(rf)) setReadyTime(rs, rf);
         }
         if (params.has('h')) {
           const h = parseFloat(params.get('h'));
@@ -266,7 +266,7 @@ function handleTablistKeydown(event) {
 // Starter Feeding - UI Controls
 // ---------------------------------------------------------------------------
 
-function setReadyTime(ratioStarter, ratioFlour, ratioWater) {
+function setReadyTime(ratioStarter, ratioFlour) {
   document.getElementById('feedingRatioStarter').value = ratioStarter;
   document.getElementById('feedingRatioFlour').value = ratioFlour;
 
@@ -384,7 +384,7 @@ function resetCalculator() {
   document.getElementById('currentStarter').value = 50;
   document.getElementById('saltPercent').value = 2;
 
-  setReadyTime(1, 1, 1);
+  setReadyTime(1, 1);
   setStarterHydration(75);
 
   const customBtn = document.getElementById('customWeightBtn');
