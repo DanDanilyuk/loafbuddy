@@ -179,6 +179,7 @@ function setActiveButton(selector, dataAttr, value) {
   buttons.forEach(btn => {
     const isMatch = btn.dataset[dataAttr] === String(value);
     btn.classList.toggle('active', isMatch);
+    btn.setAttribute('aria-pressed', String(isMatch));
   });
 }
 
@@ -273,6 +274,7 @@ function setReadyTime(ratioStarter, ratioFlour, ratioWater) {
     const isMatch = parseFloat(btn.dataset.ratioStarter) === ratioStarter &&
                     parseFloat(btn.dataset.ratioFlour) === ratioFlour;
     btn.classList.toggle('active', isMatch);
+    btn.setAttribute('aria-pressed', String(isMatch));
   });
 
   calculateStarter();
