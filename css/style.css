@@ -205,7 +205,6 @@ input[type="number"]:focus::-webkit-outer-spin-button {
   grid-template-columns: repeat(3, 1fr);
 }
 
-
 .flour-buttons,
 .time-buttons {
   display: grid;
