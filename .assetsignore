@@ -1,0 +1,9 @@
+.assetsignore
+.gitignore
+CLAUDE.md
+domains.md
+README.md
+wrangler.jsonc
+TASK_LIST.md
+.vscode
+.playwright-mcp
