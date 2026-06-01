@@ -312,14 +312,17 @@ function useStarterInRecipe() {
 function setFlourType(type) {
   const labels = { ap: 'All-Purpose', bread: 'Bread Flour', ww: 'Whole Wheat', rye: 'Rye', spelt: 'Spelt', mix: 'Mixed' };
   setActiveButton('.flour-btn', 'flourType', type);
-
+  const isMixed = type === 'mix';
   const mixedHint = document.getElementById('mixedFlourHint');
   const doughHydrationGroup = document.getElementById('doughHydrationGroup');
-  const isMixed = type === 'mix';
   if (mixedHint) mixedHint.classList.toggle('hidden', !isMixed);
-  if (doughHydrationGroup) doughHydrationGroup.classList.toggle('needs-attention', isMixed);
-
-  calculateBread();
+  if (isMixed) {
+    if (doughHydrationGroup) doughHydrationGroup.classList.add('needs-attention');
+    calculateBread();
+  } else {
+    const recommended = { ap: 70, bread: 75, ww: 80, rye: 90, spelt: 72 };
+    setDoughHydration(recommended[type]);
+  }
 }
 
 function setBreadStarterHydration(value) {
