@@ -24,17 +24,17 @@ function setIfNonDefault(params, key, value) {
 }
 
 function hasAnyCustomizations() {
-  if (parseFloat(document.getElementById('feedingRatioStarter').value) !== HASH_DEFAULTS.rs) return true;
-  if (parseFloat(document.getElementById('feedingRatioFlour').value) !== HASH_DEFAULTS.rf) return true;
-  if (parseFloat(document.getElementById('hydration').value) !== HASH_DEFAULTS.h) return true;
+  if (getInputValue('feedingRatioStarter', HASH_DEFAULTS.rs) !== HASH_DEFAULTS.rs) return true;
+  if (getInputValue('feedingRatioFlour', HASH_DEFAULTS.rf) !== HASH_DEFAULTS.rf) return true;
+  if (getInputValue('hydration', HASH_DEFAULTS.h) !== HASH_DEFAULTS.h) return true;
   if (getNonNegativeInputValue('containerWeightStarter', 0) !== HASH_DEFAULTS.cw) return true;
   if (getNonNegativeInputValue('currentStarter', 0) !== HASH_DEFAULTS.cs) return true;
 
   if (getNonNegativeInputValue('targetDoughWeight', 900) !== HASH_DEFAULTS.d) return true;
-  if (parseFloat(document.getElementById('starterPercentage').value) !== HASH_DEFAULTS.sp) return true;
-  if (parseFloat(document.getElementById('starterHydration').value) !== HASH_DEFAULTS.sh) return true;
-  if (parseFloat(document.getElementById('doughHydration').value) !== HASH_DEFAULTS.dh) return true;
-  if (parseFloat(document.getElementById('saltPercent').value) !== HASH_DEFAULTS.salt) return true;
+  if (getInputValue('starterPercentage', HASH_DEFAULTS.sp) !== HASH_DEFAULTS.sp) return true;
+  if (getInputValue('starterHydration', HASH_DEFAULTS.sh) !== HASH_DEFAULTS.sh) return true;
+  if (getInputValue('doughHydration', HASH_DEFAULTS.dh) !== HASH_DEFAULTS.dh) return true;
+  if (getInputValue('saltPercent', HASH_DEFAULTS.salt) !== HASH_DEFAULTS.salt) return true;
   if (getActiveFlourType() !== HASH_DEFAULTS.ft) return true;
 
   return false;
