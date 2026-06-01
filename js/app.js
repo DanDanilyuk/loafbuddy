@@ -13,6 +13,23 @@ const VALID_FLOUR_TYPES = ['ap', 'bread', 'ww', 'rye', 'spelt', 'mix'];
 
 let suppressHashWrite = true;
 
+// Cached references to frequently-read elements. This script runs at the end of
+// <body>, so the DOM is already parsed and these all resolve.
+const els = {
+  tabStarter: document.getElementById('tab-starter'),
+  feedingRatioStarter: document.getElementById('feedingRatioStarter'),
+  feedingRatioFlour: document.getElementById('feedingRatioFlour'),
+  hydration: document.getElementById('hydration'),
+  starterPercentage: document.getElementById('starterPercentage'),
+  starterHydration: document.getElementById('starterHydration'),
+  doughHydration: document.getElementById('doughHydration'),
+  saltPercent: document.getElementById('saltPercent'),
+  starterContainerWarning: document.getElementById('starterContainerWarning'),
+  saltWarning: document.getElementById('saltWarning'),
+  breadInfeasibleWarning: document.getElementById('breadInfeasibleWarning'),
+  breadInfeasibleWarningText: document.getElementById('breadInfeasibleWarningText')
+};
+
 function getActiveFlourType() {
   return document.querySelector('.flour-btn.active')?.dataset.flourType || HASH_DEFAULTS.ft;
 }
@@ -50,29 +67,29 @@ function writeHashState() {
   updateResetVisibility();
   if (suppressHashWrite) return;
 
-  const isStarterActive = document.getElementById('tab-starter').classList.contains('active');
+  const isStarterActive = els.tabStarter.classList.contains('active');
   const tab = isStarterActive ? 's' : 'b';
   const params = new URLSearchParams();
 
   if (isStarterActive) {
-    setIfNonDefault(params, 'rs', parseFloat(document.getElementById('feedingRatioStarter').value));
-    setIfNonDefault(params, 'rf', parseFloat(document.getElementById('feedingRatioFlour').value));
-    setIfNonDefault(params, 'h', parseFloat(document.getElementById('hydration').value));
+    setIfNonDefault(params, 'rs', parseFloat(els.feedingRatioStarter.value));
+    setIfNonDefault(params, 'rf', parseFloat(els.feedingRatioFlour.value));
+    setIfNonDefault(params, 'h', parseFloat(els.hydration.value));
     setIfNonDefault(params, 'cw', getNonNegativeInputValue('containerWeightStarter', 0));
     setIfNonDefault(params, 'cs', getNonNegativeInputValue('currentStarter', 0));
   } else {
     setIfNonDefault(params, 'd', getNonNegativeInputValue('targetDoughWeight', 900));
-    setIfNonDefault(params, 'sp', parseFloat(document.getElementById('starterPercentage').value));
-    setIfNonDefault(params, 'sh', parseFloat(document.getElementById('starterHydration').value));
+    setIfNonDefault(params, 'sp', parseFloat(els.starterPercentage.value));
+    setIfNonDefault(params, 'sh', parseFloat(els.starterHydration.value));
     const ft = getActiveFlourType();
-    const dh = parseFloat(document.getElementById('doughHydration').value);
+    const dh = parseFloat(els.doughHydration.value);
     // For mixed flour, always persist dh (even at default) so the attention-pulse clears on reload
     if (ft === 'mix' && !isNaN(dh)) {
       params.set('dh', String(dh));
     } else {
       setIfNonDefault(params, 'dh', dh);
     }
-    setIfNonDefault(params, 'salt', parseFloat(document.getElementById('saltPercent').value));
+    setIfNonDefault(params, 'salt', parseFloat(els.saltPercent.value));
     setIfNonDefault(params, 'ft', ft);
   }
 
@@ -428,7 +445,7 @@ function calculateStarter() {
   const showWarning = containerWeight > 0 && currentStarterTotal > 0 && currentStarterTotal <= containerWeight;
   const totalWeight = showWarning ? 0 : clamp(starterToUse) + clamp(flourToAdd) + clamp(waterToAdd) + clamp(containerWeight);
 
-  document.getElementById('starterContainerWarning').classList.toggle('hidden', !showWarning);
+  els.starterContainerWarning.classList.toggle('hidden', !showWarning);
 
   displayGrams('starterToUse', starterToUse);
   displayGrams('flourToAdd', flourToAdd);
@@ -451,8 +468,8 @@ function calculateBread() {
   const rawSaltPercent = getInputValue('saltPercent', 2);
   const saltPercent = Math.min(10, Math.max(0, rawSaltPercent));
 
-  const saltInput = document.getElementById('saltPercent');
-  const saltWarning = document.getElementById('saltWarning');
+  const saltInput = els.saltPercent;
+  const saltWarning = els.saltWarning;
   const typedValue = parseFloat(saltInput.value);
   const outOfRange = !isNaN(typedValue) && (typedValue < 0 || typedValue > 10);
   saltWarning.classList.toggle('hidden', !outOfRange);
@@ -474,8 +491,8 @@ function calculateBread() {
   const waterToAdd = totalWater - waterInStarter;
   const salt = totalFlour * (saltPercent / 100);
 
-  const breadInfeasibleWarning = document.getElementById('breadInfeasibleWarning');
-  const breadInfeasibleWarningText = document.getElementById('breadInfeasibleWarningText');
+  const breadInfeasibleWarning = els.breadInfeasibleWarning;
+  const breadInfeasibleWarningText = els.breadInfeasibleWarningText;
   const negativeFlour = flourToAdd < 0;
   const negativeWater = !negativeFlour && waterToAdd < 0;
   if (breadInfeasibleWarning && breadInfeasibleWarningText) {
