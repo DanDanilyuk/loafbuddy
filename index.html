@@ -122,22 +122,22 @@
         <div class="input-group">
           <div id="label-starter-hydration" class="group-label">Hydration:</div>
           <div class="hydration-buttons" role="group" aria-labelledby="label-starter-hydration">
-            <button class="hydration-btn" onclick="setStarterHydration(50)">
+            <button class="hydration-btn" data-value="50" onclick="setStarterHydration(50)">
               <span class="hydration-label">50%</span>
               <span class="hydration-ratio">2:1 flour:water</span>
               <span class="hydration-desc">Stiff</span>
             </button>
-            <button class="hydration-btn active" onclick="setStarterHydration(75)">
+            <button class="hydration-btn active" data-value="75" onclick="setStarterHydration(75)">
               <span class="hydration-label">75%</span>
               <span class="hydration-ratio">4:3 flour:water</span>
               <span class="hydration-desc">Firm</span>
             </button>
-            <button class="hydration-btn" onclick="setStarterHydration(100)">
+            <button class="hydration-btn" data-value="100" onclick="setStarterHydration(100)">
               <span class="hydration-label">100%</span>
               <span class="hydration-ratio">1:1 flour:water</span>
               <span class="hydration-desc">Standard</span>
             </button>
-            <button class="hydration-btn" onclick="setStarterHydration(125)">
+            <button class="hydration-btn" data-value="125" onclick="setStarterHydration(125)">
               <span class="hydration-label">125%</span>
               <span class="hydration-ratio">4:5 flour:water</span>
               <span class="hydration-desc">Liquid</span>
@@ -179,19 +179,19 @@
         <div class="input-group">
           <div id="label-dough-weight" class="group-label">How much dough do you need?</div>
           <div class="weight-buttons" role="group" aria-labelledby="label-dough-weight">
-            <button class="weight-btn" onclick="setDoughWeight(650)">
+            <button class="weight-btn" data-weight="650" onclick="setDoughWeight(650)">
               <span class="hydration-label">Small Loaf</span>
               <span class="hydration-desc">650g</span>
             </button>
-            <button class="weight-btn active" onclick="setDoughWeight(900)">
+            <button class="weight-btn active" data-weight="900" onclick="setDoughWeight(900)">
               <span class="hydration-label">One Loaf</span>
               <span class="hydration-desc">900g</span>
             </button>
-            <button class="weight-btn" onclick="setDoughWeight(1800)">
+            <button class="weight-btn" data-weight="1800" onclick="setDoughWeight(1800)">
               <span class="hydration-label">Two Loaves</span>
               <span class="hydration-desc">1800g</span>
             </button>
-            <div class="weight-btn weight-btn--custom" id="customWeightBtn" role="button" tabindex="0" onclick="toggleCustomWeight()" onkeydown="handleCustomWeightKeydown(event)">
+            <div class="weight-btn weight-btn--custom" id="customWeightBtn" data-weight="custom" role="button" tabindex="0" onclick="toggleCustomWeight()" onkeydown="handleCustomWeightKeydown(event)">
               <span class="weight-btn-label">
                 <span class="hydration-label">Custom</span>
                 <span class="hydration-desc">Enter your own</span>
@@ -208,17 +208,17 @@
         <div class="input-group">
           <div id="label-rise-speed" class="group-label">How fast should it rise?</div>
           <div class="starter-pct-buttons" role="group" aria-labelledby="label-rise-speed">
-            <button class="starter-pct-btn" onclick="setStarterPercentage(10)">
+            <button class="starter-pct-btn" data-value="10" onclick="setStarterPercentage(10)">
               <span class="hydration-label">Slow Rise</span>
               <span class="hydration-ratio">10%</span>
               <span class="hydration-desc">8-12 hours</span>
             </button>
-            <button class="starter-pct-btn active" onclick="setStarterPercentage(20)">
+            <button class="starter-pct-btn active" data-value="20" onclick="setStarterPercentage(20)">
               <span class="hydration-label">Standard</span>
               <span class="hydration-ratio">20%</span>
               <span class="hydration-desc">4-6 Hours</span>
             </button>
-            <button class="starter-pct-btn" onclick="setStarterPercentage(30)">
+            <button class="starter-pct-btn" data-value="30" onclick="setStarterPercentage(30)">
               <span class="hydration-label">Quick Rise</span>
               <span class="hydration-ratio">30%</span>
               <span class="hydration-desc">2-4 hours</span>
@@ -230,27 +230,27 @@
         <div class="input-group">
           <div id="label-flour-type" class="group-label">What flour are you using?</div>
           <div class="flour-buttons" role="group" aria-labelledby="label-flour-type">
-            <button class="flour-btn" onclick="setFlourType('ap')">
+            <button class="flour-btn" data-flour-type="ap" onclick="setFlourType('ap')">
               <span class="flour-label">All-Purpose</span>
               <span class="flour-desc">Best at 70% hydration</span>
             </button>
-            <button class="flour-btn active" onclick="setFlourType('bread')">
+            <button class="flour-btn active" data-flour-type="bread" onclick="setFlourType('bread')">
               <span class="flour-label">Bread Flour</span>
               <span class="flour-desc">Best at 75% hydration</span>
             </button>
-            <button class="flour-btn" onclick="setFlourType('ww')">
+            <button class="flour-btn" data-flour-type="ww" onclick="setFlourType('ww')">
               <span class="flour-label">Whole Wheat</span>
               <span class="flour-desc">Best at 80% hydration</span>
             </button>
-            <button class="flour-btn" onclick="setFlourType('rye')">
+            <button class="flour-btn" data-flour-type="rye" onclick="setFlourType('rye')">
               <span class="flour-label">Rye</span>
               <span class="flour-desc">Best at 90% hydration</span>
             </button>
-            <button class="flour-btn" onclick="setFlourType('spelt')">
+            <button class="flour-btn" data-flour-type="spelt" onclick="setFlourType('spelt')">
               <span class="flour-label">Spelt</span>
               <span class="flour-desc">Best at 72% hydration</span>
             </button>
-            <button class="flour-btn" onclick="setFlourType('mix')">
+            <button class="flour-btn" data-flour-type="mix" onclick="setFlourType('mix')">
               <span class="flour-label">Mixed</span>
               <span class="flour-desc">Set hydration manually</span>
             </button>
@@ -263,22 +263,22 @@
         <div class="input-group">
           <div id="label-bread-starter-hydration" class="group-label">What's your starter's hydration?</div>
           <div class="starter-hydration-buttons" role="group" aria-labelledby="label-bread-starter-hydration">
-            <button class="hydration-btn" onclick="setBreadStarterHydration(50)">
+            <button class="hydration-btn" data-value="50" onclick="setBreadStarterHydration(50)">
               <span class="hydration-label">50%</span>
               <span class="hydration-ratio">2:1 flour:water</span>
               <span class="hydration-desc">Stiff</span>
             </button>
-            <button class="hydration-btn active" onclick="setBreadStarterHydration(75)">
+            <button class="hydration-btn active" data-value="75" onclick="setBreadStarterHydration(75)">
               <span class="hydration-label">75%</span>
               <span class="hydration-ratio">4:3 flour:water</span>
               <span class="hydration-desc">Firm</span>
             </button>
-            <button class="hydration-btn" onclick="setBreadStarterHydration(100)">
+            <button class="hydration-btn" data-value="100" onclick="setBreadStarterHydration(100)">
               <span class="hydration-label">100%</span>
               <span class="hydration-ratio">1:1 flour:water</span>
               <span class="hydration-desc">Standard</span>
             </button>
-            <button class="hydration-btn" onclick="setBreadStarterHydration(125)">
+            <button class="hydration-btn" data-value="125" onclick="setBreadStarterHydration(125)">
               <span class="hydration-label">125%</span>
               <span class="hydration-ratio">4:5 flour:water</span>
               <span class="hydration-desc">Liquid</span>
@@ -290,22 +290,22 @@
         <div class="input-group" id="doughHydrationGroup">
           <div id="label-dough-hydration" class="group-label">How wet do you want your dough?</div>
           <div class="dough-hydration-buttons" role="group" aria-labelledby="label-dough-hydration">
-            <button class="hydration-btn" onclick="setDoughHydration(65)">
+            <button class="hydration-btn" data-value="65" onclick="setDoughHydration(65)">
               <span class="hydration-label">65%</span>
               <span class="hydration-ratio">20:13 flour:water</span>
               <span class="hydration-desc">Bagels</span>
             </button>
-            <button class="hydration-btn active" onclick="setDoughHydration(75)">
+            <button class="hydration-btn active" data-value="75" onclick="setDoughHydration(75)">
               <span class="hydration-label">75%</span>
               <span class="hydration-ratio">4:3 flour:water</span>
               <span class="hydration-desc">Standard Loaf</span>
             </button>
-            <button class="hydration-btn" onclick="setDoughHydration(80)">
+            <button class="hydration-btn" data-value="80" onclick="setDoughHydration(80)">
               <span class="hydration-label">80%</span>
               <span class="hydration-ratio">5:4 flour:water</span>
               <span class="hydration-desc">Ciabatta</span>
             </button>
-            <button class="hydration-btn" onclick="setDoughHydration(90)">
+            <button class="hydration-btn" data-value="90" onclick="setDoughHydration(90)">
               <span class="hydration-label">90%</span>
               <span class="hydration-ratio">10:9 flour:water</span>
               <span class="hydration-desc">Focaccia</span>

@@ -9,23 +9,12 @@ const HASH_DEFAULTS = {
   d: 900, sp: 20, sh: 75, dh: 75, salt: 2, ft: 'bread'
 };
 
-const FLOUR_LABEL_TO_TYPE = {
-  'All-Purpose': 'ap',
-  'Bread Flour': 'bread',
-  'Whole Wheat': 'ww',
-  'Rye': 'rye',
-  'Spelt': 'spelt',
-  'Mixed': 'mix'
-};
-
 const VALID_FLOUR_TYPES = ['ap', 'bread', 'ww', 'rye', 'spelt', 'mix'];
 
 let suppressHashWrite = true;
 
 function getActiveFlourType() {
-  const active = document.querySelector('.flour-btn.active .flour-label');
-  if (!active) return HASH_DEFAULTS.ft;
-  return FLOUR_LABEL_TO_TYPE[active.textContent] || HASH_DEFAULTS.ft;
+  return document.querySelector('.flour-btn.active')?.dataset.flourType || HASH_DEFAULTS.ft;
 }
 
 function setIfNonDefault(params, key, value) {
@@ -178,13 +167,11 @@ function applyHashState() {
 // Utility
 // ---------------------------------------------------------------------------
 
-function setActiveButton(selector, labelSelector, matchText) {
+function setActiveButton(selector, dataAttr, value) {
   const buttons = document.querySelectorAll(selector);
   buttons.forEach(btn => {
-    btn.classList.remove('active');
-    if (btn.querySelector(labelSelector).textContent === matchText) {
-      btn.classList.add('active');
-    }
+    const isMatch = btn.dataset[dataAttr] === String(value);
+    btn.classList.toggle('active', isMatch);
   });
 }
 
@@ -297,7 +284,7 @@ function updateRatioLabels() {
 
 function setStarterHydration(value) {
   document.getElementById('hydration').value = value;
-  setActiveButton('#section-starter .hydration-buttons .hydration-btn', '.hydration-label', value + '%');
+  setActiveButton('#section-starter .hydration-buttons .hydration-btn', 'value', value);
   updateRatioLabels();
   calculateStarter();
 }
@@ -324,7 +311,7 @@ function useStarterInRecipe() {
 
 function setFlourType(type) {
   const labels = { ap: 'All-Purpose', bread: 'Bread Flour', ww: 'Whole Wheat', rye: 'Rye', spelt: 'Spelt', mix: 'Mixed' };
-  setActiveButton('.flour-btn', '.flour-label', labels[type]);
+  setActiveButton('.flour-btn', 'flourType', type);
 
   const mixedHint = document.getElementById('mixedFlourHint');
   const doughHydrationGroup = document.getElementById('doughHydrationGroup');
@@ -337,26 +324,26 @@ function setFlourType(type) {
 
 function setBreadStarterHydration(value) {
   document.getElementById('starterHydration').value = value;
-  setActiveButton('.starter-hydration-buttons .hydration-btn', '.hydration-label', value + '%');
+  setActiveButton('.starter-hydration-buttons .hydration-btn', 'value', value);
   calculateBread();
 }
 
 function setDoughHydration(value) {
   document.getElementById('doughHydration').value = value;
-  setActiveButton('.dough-hydration-buttons .hydration-btn', '.hydration-label', value + '%');
+  setActiveButton('.dough-hydration-buttons .hydration-btn', 'value', value);
   const doughHydrationGroup = document.getElementById('doughHydrationGroup');
   if (doughHydrationGroup) doughHydrationGroup.classList.remove('needs-attention');
   calculateBread();
 }
 
 function setDoughWeight(weight) {
-  setActiveButton('.weight-btn', '.hydration-desc', weight + 'g');
+  setActiveButton('.weight-btn', 'weight', weight);
   document.getElementById('targetDoughWeight').value = weight;
   calculateBread();
 }
 
 function toggleCustomWeight() {
-  setActiveButton('.weight-btn', '.hydration-label', 'Custom');
+  setActiveButton('.weight-btn', 'weight', 'custom');
 
   const input = document.getElementById('targetDoughWeight');
   input.focus();
@@ -372,7 +359,7 @@ function handleCustomWeightKeydown(event) {
 
 function setStarterPercentage(percent) {
   document.getElementById('starterPercentage').value = percent;
-  setActiveButton('.starter-pct-btn', '.hydration-ratio', percent + '%');
+  setActiveButton('.starter-pct-btn', 'value', percent);
   calculateBread();
 }
 
