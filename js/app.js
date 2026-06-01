@@ -189,7 +189,8 @@ function setActiveButton(selector, labelSelector, matchText) {
 }
 
 function getInputValue(id, fallback) {
-  return parseFloat(document.getElementById(id).value) || fallback;
+  const v = parseFloat(document.getElementById(id).value);
+  return isNaN(v) ? fallback : v;
 }
 
 function getNonNegativeInputValue(id, fallback) {
