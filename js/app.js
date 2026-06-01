@@ -64,9 +64,16 @@ function writeHashState() {
     setIfNonDefault(params, 'd', getNonNegativeInputValue('targetDoughWeight', 900));
     setIfNonDefault(params, 'sp', parseFloat(document.getElementById('starterPercentage').value));
     setIfNonDefault(params, 'sh', parseFloat(document.getElementById('starterHydration').value));
-    setIfNonDefault(params, 'dh', parseFloat(document.getElementById('doughHydration').value));
+    const ft = getActiveFlourType();
+    const dh = parseFloat(document.getElementById('doughHydration').value);
+    // For mixed flour, always persist dh (even at default) so the attention-pulse clears on reload
+    if (ft === 'mix' && !isNaN(dh)) {
+      params.set('dh', String(dh));
+    } else {
+      setIfNonDefault(params, 'dh', dh);
+    }
     setIfNonDefault(params, 'salt', parseFloat(document.getElementById('saltPercent').value));
-    setIfNonDefault(params, 'ft', getActiveFlourType());
+    setIfNonDefault(params, 'ft', ft);
   }
 
   const qs = params.toString();
