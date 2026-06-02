@@ -11,6 +11,11 @@ const HASH_DEFAULTS = {
 
 const VALID_FLOUR_TYPES = ['ap', 'bread', 'ww', 'rye', 'spelt', 'mix'];
 
+// Recommended dough hydration per flour type (Mixed has none - it is manual).
+const FLOUR_HYDRATION = { ap: 70, bread: 75, ww: 80, rye: 90, spelt: 72 };
+const FLOUR_LABELS = { ap: 'All-Purpose', bread: 'Bread Flour', ww: 'Whole Wheat', rye: 'Rye', spelt: 'Spelt', mix: 'Mixed' };
+const DOUGH_PRESETS = [65, 75, 80, 90];
+
 let suppressHashWrite = true;
 
 // Cached references to frequently-read elements. This script runs at the end of
@@ -23,6 +28,8 @@ const els = {
   starterPercentage: document.getElementById('starterPercentage'),
   starterHydration: document.getElementById('starterHydration'),
   doughHydration: document.getElementById('doughHydration'),
+  defaultHydrationBtn: document.getElementById('defaultHydrationBtn'),
+  mixedDoughHydration: document.getElementById('mixedDoughHydration'),
   saltPercent: document.getElementById('saltPercent'),
   starterContainerWarning: document.getElementById('starterContainerWarning'),
   saltWarning: document.getElementById('saltWarning'),
@@ -83,11 +90,12 @@ function writeHashState() {
     setIfNonDefault(params, 'sh', parseFloat(els.starterHydration.value));
     const ft = getActiveFlourType();
     const dh = parseFloat(els.doughHydration.value);
-    // For mixed flour, always persist dh (even at default) so the attention-pulse clears on reload
-    if (ft === 'mix' && !isNaN(dh)) {
+    const defaultHydrationActive = els.defaultHydrationBtn.classList.contains('active');
+    // When "Default" tracks a named flour, hydration is derived from the flour on
+    // load, so there is no need to store it. Otherwise (a preset opted out, or a
+    // Mixed manual value) persist dh exactly so the state round-trips.
+    if (!(defaultHydrationActive && ft !== 'mix') && !isNaN(dh)) {
       params.set('dh', String(dh));
-    } else {
-      setIfNonDefault(params, 'dh', dh);
     }
     setIfNonDefault(params, 'salt', parseFloat(els.saltPercent.value));
     setIfNonDefault(params, 'ft', ft);
@@ -145,7 +153,16 @@ function applyHashState() {
         }
         if (params.has('dh')) {
           const dh = parseFloat(params.get('dh'));
-          if (!isNaN(dh)) setDoughHydration(dh);
+          if (!isNaN(dh)) {
+            // A non-preset value under Mixed flour lives in the custom input;
+            // anything else maps onto a preset (or sets the raw value).
+            if (getActiveFlourType() === 'mix' && DOUGH_PRESETS.indexOf(dh) === -1) {
+              els.mixedDoughHydration.value = dh;
+              setDefaultHydration();
+            } else {
+              setDoughHydration(dh);
+            }
+          }
         }
         if (params.has('salt')) {
           const salt = parseFloat(params.get('salt'));
@@ -335,20 +352,73 @@ function useStarterInRecipe() {
 // Bread Baking - UI Controls
 // ---------------------------------------------------------------------------
 
+// Refresh the "Default" hydration option's label to the active flour's recommendation.
+function updateDefaultHydrationLabel() {
+  const ft = getActiveFlourType();
+  if (ft === 'mix') return; // Mixed shows the manual input, not the label.
+  const pctEl = document.getElementById('defaultHydrationPct');
+  const descEl = document.getElementById('defaultHydrationDesc');
+  if (pctEl) pctEl.textContent = FLOUR_HYDRATION[ft] + '%';
+  if (descEl) descEl.textContent = 'Best for ' + FLOUR_LABELS[ft];
+}
+
+function isDefaultHydrationActive() {
+  return els.defaultHydrationBtn.classList.contains('active');
+}
+
 function setFlourType(type) {
-  const labels = { ap: 'All-Purpose', bread: 'Bread Flour', ww: 'Whole Wheat', rye: 'Rye', spelt: 'Spelt', mix: 'Mixed' };
   setActiveButton('.flour-btn', 'flourType', type);
   const isMixed = type === 'mix';
-  const mixedHint = document.getElementById('mixedFlourHint');
-  const doughHydrationGroup = document.getElementById('doughHydrationGroup');
-  if (mixedHint) mixedHint.classList.toggle('hidden', !isMixed);
+  els.defaultHydrationBtn.classList.toggle('is-mixed', isMixed);
+
   if (isMixed) {
-    if (doughHydrationGroup) doughHydrationGroup.classList.add('needs-attention');
-    calculateBread();
+    // Mixed has no recommended hydration, so the Default option becomes a manual
+    // % input. While Default is the selected option, the typed value is used.
+    if (isDefaultHydrationActive()) {
+      els.doughHydration.value = getInputValue('mixedDoughHydration', 75);
+      if (!suppressHashWrite) {
+        els.mixedDoughHydration.focus();
+        els.mixedDoughHydration.select();
+      }
+    }
   } else {
-    const recommended = { ap: 70, bread: 75, ww: 80, rye: 90, spelt: 72 };
-    setDoughHydration(recommended[type]);
+    updateDefaultHydrationLabel();
+    // While "Default" is selected, dough hydration tracks the flour's recommendation.
+    // Picking a specific preset opts out, and a live flour change leaves it alone.
+    if (isDefaultHydrationActive()) {
+      els.doughHydration.value = FLOUR_HYDRATION[type];
+    }
   }
+  calculateBread();
+}
+
+// "Default" hydration option: track the flour (named) or take the manual % (Mixed).
+function setDefaultHydration() {
+  setActiveButton('.dough-hydration-buttons .hydration-btn', 'value', 'default');
+  if (getActiveFlourType() === 'mix') {
+    els.doughHydration.value = getInputValue('mixedDoughHydration', 75);
+    if (!suppressHashWrite) {
+      els.mixedDoughHydration.focus();
+      els.mixedDoughHydration.select();
+    }
+  } else {
+    els.doughHydration.value = FLOUR_HYDRATION[getActiveFlourType()];
+  }
+  calculateBread();
+}
+
+function handleDefaultHydrationKeydown(event) {
+  if (event.key === 'Enter' || event.key === ' ') {
+    event.preventDefault();
+    setDefaultHydration();
+  }
+}
+
+// Typing in the Mixed % input selects the Default option and applies the value.
+function onMixedHydrationInput() {
+  setActiveButton('.dough-hydration-buttons .hydration-btn', 'value', 'default');
+  els.doughHydration.value = getInputValue('mixedDoughHydration', 75);
+  calculateBread();
 }
 
 function setBreadStarterHydration(value) {
@@ -358,10 +428,10 @@ function setBreadStarterHydration(value) {
 }
 
 function setDoughHydration(value) {
-  document.getElementById('doughHydration').value = value;
+  els.doughHydration.value = value;
   setActiveButton('.dough-hydration-buttons .hydration-btn', 'value', value);
-  const doughHydrationGroup = document.getElementById('doughHydrationGroup');
-  if (doughHydrationGroup) doughHydrationGroup.classList.remove('needs-attention');
+  // Keep the Mixed custom input in sync so it reflects the active value.
+  if (getActiveFlourType() === 'mix') els.mixedDoughHydration.value = value;
   calculateBread();
 }
 
@@ -408,17 +478,16 @@ function resetCalculator() {
   if (customBtn) customBtn.classList.remove('active');
   setDoughWeight(900);
   setStarterPercentage(20);
+  els.mixedDoughHydration.value = 75;
   setFlourType('bread');
   setBreadStarterHydration(75);
-  setDoughHydration(75);
+  setDefaultHydration();
 
   ['saltWarning', 'starterContainerWarning',
-   'breadInfeasibleWarning', 'mixedFlourHint'].forEach(id => {
+   'breadInfeasibleWarning'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.classList.add('hidden');
   });
-  const doughHydrationGroup = document.getElementById('doughHydrationGroup');
-  if (doughHydrationGroup) doughHydrationGroup.classList.remove('needs-attention');
 
   calculateStarter();
   calculateBread();
@@ -519,6 +588,7 @@ function calculateBread() {
 // ---------------------------------------------------------------------------
 
 updateRatioLabels();
+updateDefaultHydrationLabel();
 calculateStarter();
 calculateBread();
 document.querySelector('.tabs').addEventListener('keydown', handleTablistKeydown);

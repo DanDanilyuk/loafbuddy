@@ -445,6 +445,92 @@ input[type="number"]:focus::-webkit-outer-spin-button {
   opacity: 0.9;
 }
 
+/* Default dough-hydration option: sits inline as the first of five buttons, tracks
+   the flour (named) or holds a manual % input (Mixed). Mirrors the custom pattern. */
+.dough-hydration-buttons {
+  grid-template-columns: repeat(5, 1fr);
+}
+
+.dough-hydration-buttons .hydration-btn--default {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hydration-default-label {
+  display: block;
+}
+
+/* Mixed flour turns the option into a clean, label-led custom % field. The number
+   is borderless and inherits the button's text color, so it reads on both the
+   active gradient and the resting state without a floating white box. */
+.hydration-default-input {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  width: 100%;
+}
+
+.hydration-btn--default.is-mixed .hydration-default-label {
+  display: none;
+}
+
+.hydration-btn--default.is-mixed .hydration-default-input {
+  display: flex;
+}
+
+.hydration-custom-tag {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+
+.hydration-custom-field {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 1px;
+  border-bottom: 1.5px solid currentColor;
+  transition: border-bottom-width 0.15s ease;
+}
+
+.hydration-custom-field:focus-within {
+  border-bottom-width: 2px;
+}
+
+.hydration-default-input input[type="number"] {
+  width: 3.4ch;
+  padding: 1px 0;
+  border: none;
+  background: transparent;
+  color: inherit;
+  caret-color: currentColor;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.15;
+  text-align: center;
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+.hydration-default-input input[type="number"]:focus {
+  outline: none;
+}
+
+.hydration-default-input input[type="number"]::-webkit-inner-spin-button,
+.hydration-default-input input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.hydration-default-suffix {
+  font-size: 14px;
+  font-weight: 700;
+  opacity: 0.85;
+}
+
 .sr-only {
   position: absolute;
   width: 1px;
@@ -455,29 +541,6 @@ input[type="number"]:focus::-webkit-outer-spin-button {
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border: 0;
-}
-
-#doughHydrationGroup.needs-attention {
-  border-radius: 10px;
-  padding: 10px;
-  margin: 8px -10px 8px -10px;
-  box-shadow: 0 0 0 2px var(--brand-primary), 0 0 0 6px var(--brand-shadow);
-  transition: box-shadow 0.2s ease;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  #doughHydrationGroup.needs-attention {
-    animation: needs-attention-pulse 2.2s ease-in-out infinite;
-  }
-
-  @keyframes needs-attention-pulse {
-    0%, 100% {
-      box-shadow: 0 0 0 2px var(--brand-primary), 0 0 0 4px var(--brand-shadow);
-    }
-    50% {
-      box-shadow: 0 0 0 2px var(--brand-primary), 0 0 0 10px rgba(102, 126, 234, 0.08);
-    }
-  }
 }
 
 footer {

@@ -278,9 +278,6 @@
               <span class="flour-desc">Set hydration manually</span>
             </button>
           </div>
-          <div class="info-text hidden" id="mixedFlourHint">
-            <span>Pick a dough hydration below; 75% is a solid starting point.</span>
-          </div>
         </div>
 
         <div class="input-group">
@@ -313,12 +310,26 @@
         <div class="input-group" id="doughHydrationGroup">
           <div id="label-dough-hydration" class="group-label">How wet do you want your dough?</div>
           <div class="dough-hydration-buttons" role="group" aria-labelledby="label-dough-hydration">
+            <div class="hydration-btn hydration-btn--default active" id="defaultHydrationBtn" data-value="default" role="button" tabindex="0" aria-pressed="true" onclick="setDefaultHydration()" onkeydown="handleDefaultHydrationKeydown(event)">
+              <span class="hydration-default-label">
+                <span class="hydration-label">Default <span id="defaultHydrationPct">75%</span></span>
+                <span class="hydration-desc" id="defaultHydrationDesc">Best for Bread Flour</span>
+              </span>
+              <div class="hydration-default-input">
+                <span class="hydration-custom-tag" aria-hidden="true">Custom</span>
+                <span class="hydration-custom-field">
+                  <label for="mixedDoughHydration" class="sr-only">Custom dough hydration percent</label>
+                  <input type="number" id="mixedDoughHydration" value="75" min="1" max="200" step="1" oninput="onMixedHydrationInput()" onclick="event.stopPropagation()">
+                  <span class="hydration-default-suffix" aria-hidden="true">%</span>
+                </span>
+              </div>
+            </div>
             <button class="hydration-btn" data-value="65" aria-pressed="false" onclick="setDoughHydration(65)">
               <span class="hydration-label">65%</span>
               <span class="hydration-ratio">20:13 flour:water</span>
               <span class="hydration-desc">Bagels</span>
             </button>
-            <button class="hydration-btn active" data-value="75" aria-pressed="true" onclick="setDoughHydration(75)">
+            <button class="hydration-btn" data-value="75" aria-pressed="false" onclick="setDoughHydration(75)">
               <span class="hydration-label">75%</span>
               <span class="hydration-ratio">4:3 flour:water</span>
               <span class="hydration-desc">Standard Loaf</span>
