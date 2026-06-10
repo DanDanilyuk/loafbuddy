@@ -15,6 +15,7 @@ const VALID_FLOUR_TYPES = ['ap', 'bread', 'ww', 'rye', 'spelt', 'mix'];
 const FLOUR_HYDRATION = { ap: 70, bread: 75, ww: 80, rye: 90, spelt: 72 };
 const FLOUR_LABELS = { ap: 'All-Purpose', bread: 'Bread Flour', ww: 'Whole Wheat', rye: 'Rye', spelt: 'Spelt', mix: 'Mixed' };
 const DOUGH_PRESETS = [65, 75, 80, 90];
+const WEIGHT_PRESETS = [650, 900, 1800];
 
 let suppressHashWrite = true;
 
@@ -436,7 +437,10 @@ function setDoughHydration(value) {
 }
 
 function setDoughWeight(weight) {
-  setActiveButton('.weight-btn', 'weight', weight);
+  // A non-preset weight (only reachable via a shared URL) belongs to the Custom
+  // option, so activate that button to reveal the input with the value in it.
+  const isPreset = WEIGHT_PRESETS.indexOf(weight) !== -1;
+  setActiveButton('.weight-btn', 'weight', isPreset ? weight : 'custom');
   document.getElementById('targetDoughWeight').value = weight;
   calculateBread();
 }
