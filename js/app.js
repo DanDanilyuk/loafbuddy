@@ -79,28 +79,29 @@ function writeHashState() {
   const tab = isStarterActive ? 's' : 'b';
   const params = new URLSearchParams();
 
-  if (isStarterActive) {
-    setIfNonDefault(params, 'rs', parseFloat(els.feedingRatioStarter.value));
-    setIfNonDefault(params, 'rf', parseFloat(els.feedingRatioFlour.value));
-    setIfNonDefault(params, 'h', parseFloat(els.hydration.value));
-    setIfNonDefault(params, 'cw', getNonNegativeInputValue('containerWeightStarter', 0));
-    setIfNonDefault(params, 'cs', getNonNegativeInputValue('currentStarter', 0));
-  } else {
-    setIfNonDefault(params, 'd', getNonNegativeInputValue('targetDoughWeight', 900));
-    setIfNonDefault(params, 'sp', parseFloat(els.starterPercentage.value));
-    setIfNonDefault(params, 'sh', parseFloat(els.starterHydration.value));
-    const ft = getActiveFlourType();
-    const dh = parseFloat(els.doughHydration.value);
-    const defaultHydrationActive = els.defaultHydrationBtn.classList.contains('active');
-    // When "Default" tracks a named flour, hydration is derived from the flour on
-    // load, so there is no need to store it. Otherwise (a preset opted out, or a
-    // Mixed manual value) persist dh exactly so the state round-trips.
-    if (!(defaultHydrationActive && ft !== 'mix') && !isNaN(dh)) {
-      params.set('dh', String(dh));
-    }
-    setIfNonDefault(params, 'salt', parseFloat(els.saltPercent.value));
-    setIfNonDefault(params, 'ft', ft);
+  // Persist both tabs' non-default params into one query string (the keys are
+  // disjoint). The s/b prefix only records which tab to show, so switching tabs
+  // no longer discards the other tab's share state.
+  setIfNonDefault(params, 'rs', parseFloat(els.feedingRatioStarter.value));
+  setIfNonDefault(params, 'rf', parseFloat(els.feedingRatioFlour.value));
+  setIfNonDefault(params, 'h', parseFloat(els.hydration.value));
+  setIfNonDefault(params, 'cw', getNonNegativeInputValue('containerWeightStarter', 0));
+  setIfNonDefault(params, 'cs', getNonNegativeInputValue('currentStarter', 0));
+
+  setIfNonDefault(params, 'd', getNonNegativeInputValue('targetDoughWeight', 900));
+  setIfNonDefault(params, 'sp', parseFloat(els.starterPercentage.value));
+  setIfNonDefault(params, 'sh', parseFloat(els.starterHydration.value));
+  const ft = getActiveFlourType();
+  const dh = parseFloat(els.doughHydration.value);
+  const defaultHydrationActive = els.defaultHydrationBtn.classList.contains('active');
+  // When "Default" tracks a named flour, hydration is derived from the flour on
+  // load, so there is no need to store it. Otherwise (a preset opted out, or a
+  // Mixed manual value) persist dh exactly so the state round-trips.
+  if (!(defaultHydrationActive && ft !== 'mix') && !isNaN(dh)) {
+    params.set('dh', String(dh));
   }
+  setIfNonDefault(params, 'salt', parseFloat(els.saltPercent.value));
+  setIfNonDefault(params, 'ft', ft);
 
   const qs = params.toString();
   const hasParams = qs.length > 0;
@@ -131,69 +132,70 @@ function applyHashState() {
 
     suppressHashWrite = true;
     try {
-      if (tab === 'b') {
-        showTab('bread');
+      // The tab prefix only decides which tab to show; both groups of params are
+      // applied regardless, so a shared URL restores both sections at once.
+      showTab(tab === 'b' ? 'bread' : 'starter');
 
-        if (params.has('ft')) {
-          const ft = params.get('ft');
-          if (VALID_FLOUR_TYPES.indexOf(ft) !== -1) {
-            setFlourType(ft);
-          }
-        }
-        if (params.has('d')) {
-          const d = parseFloat(params.get('d'));
-          if (!isNaN(d) && d > 0) setDoughWeight(d);
-        }
-        if (params.has('sp')) {
-          const sp = parseFloat(params.get('sp'));
-          if (!isNaN(sp) && sp >= 0) setStarterPercentage(sp);
-        }
-        if (params.has('sh')) {
-          const sh = parseFloat(params.get('sh'));
-          if (!isNaN(sh) && sh >= 0) setBreadStarterHydration(sh);
-        }
-        if (params.has('dh')) {
-          const dh = parseFloat(params.get('dh'));
-          if (!isNaN(dh) && dh > 0) {
-            // A non-preset value under Mixed flour lives in the custom input;
-            // anything else maps onto a preset (or sets the raw value).
-            if (getActiveFlourType() === 'mix' && DOUGH_PRESETS.indexOf(dh) === -1) {
-              els.mixedDoughHydration.value = dh;
-              setDefaultHydration();
-            } else {
-              setDoughHydration(dh);
-            }
-          }
-        }
-        if (params.has('salt')) {
-          const salt = parseFloat(params.get('salt'));
-          if (!isNaN(salt)) document.getElementById('saltPercent').value = salt;
-        }
-        calculateBread();
-      } else if (tab === 's') {
-        showTab('starter');
-
-        const hasRs = params.has('rs');
-        const hasRf = params.has('rf');
-        if (hasRs || hasRf) {
-          const rs = hasRs ? parseFloat(params.get('rs')) : HASH_DEFAULTS.rs;
-          const rf = hasRf ? parseFloat(params.get('rf')) : HASH_DEFAULTS.rf;
-          if (!isNaN(rs) && rs > 0 && !isNaN(rf) && rf > 0) setReadyTime(rs, rf);
-        }
-        if (params.has('h')) {
-          const h = parseFloat(params.get('h'));
-          if (!isNaN(h)) setStarterHydration(h);
-        }
-        if (params.has('cw')) {
-          const cw = parseFloat(params.get('cw'));
-          if (!isNaN(cw) && cw >= 0) document.getElementById('containerWeightStarter').value = cw;
-        }
-        if (params.has('cs')) {
-          const cs = parseFloat(params.get('cs'));
-          if (!isNaN(cs) && cs >= 0) document.getElementById('currentStarter').value = cs;
-        }
-        calculateStarter();
+      // Starter params
+      const hasRs = params.has('rs');
+      const hasRf = params.has('rf');
+      if (hasRs || hasRf) {
+        const rs = hasRs ? parseFloat(params.get('rs')) : HASH_DEFAULTS.rs;
+        const rf = hasRf ? parseFloat(params.get('rf')) : HASH_DEFAULTS.rf;
+        if (!isNaN(rs) && rs > 0 && !isNaN(rf) && rf > 0) setReadyTime(rs, rf);
       }
+      if (params.has('h')) {
+        const h = parseFloat(params.get('h'));
+        if (!isNaN(h)) setStarterHydration(h);
+      }
+      if (params.has('cw')) {
+        const cw = parseFloat(params.get('cw'));
+        if (!isNaN(cw) && cw >= 0) document.getElementById('containerWeightStarter').value = cw;
+      }
+      if (params.has('cs')) {
+        const cs = parseFloat(params.get('cs'));
+        if (!isNaN(cs) && cs >= 0) document.getElementById('currentStarter').value = cs;
+      }
+
+      // Bread params (ft first so the Mixed-flour dh rule below sees it)
+      if (params.has('ft')) {
+        const ft = params.get('ft');
+        if (VALID_FLOUR_TYPES.indexOf(ft) !== -1) {
+          setFlourType(ft);
+        }
+      }
+      if (params.has('d')) {
+        const d = parseFloat(params.get('d'));
+        if (!isNaN(d) && d > 0) setDoughWeight(d);
+      }
+      if (params.has('sp')) {
+        const sp = parseFloat(params.get('sp'));
+        if (!isNaN(sp) && sp >= 0) setStarterPercentage(sp);
+      }
+      if (params.has('sh')) {
+        const sh = parseFloat(params.get('sh'));
+        if (!isNaN(sh) && sh >= 0) setBreadStarterHydration(sh);
+      }
+      if (params.has('dh')) {
+        const dh = parseFloat(params.get('dh'));
+        if (!isNaN(dh) && dh > 0) {
+          // A non-preset value under Mixed flour lives in the custom input;
+          // anything else maps onto a preset (or sets the raw value).
+          if (getActiveFlourType() === 'mix' && DOUGH_PRESETS.indexOf(dh) === -1) {
+            els.mixedDoughHydration.value = dh;
+            setDefaultHydration();
+          } else {
+            setDoughHydration(dh);
+          }
+        }
+      }
+      if (params.has('salt')) {
+        const salt = parseFloat(params.get('salt'));
+        if (!isNaN(salt)) document.getElementById('saltPercent').value = salt;
+      }
+
+      calculateStarter();
+      calculateBread();
     } finally {
       suppressHashWrite = false;
     }
