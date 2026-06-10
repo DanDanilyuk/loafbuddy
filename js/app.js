@@ -606,5 +606,10 @@ calculateStarter();
 calculateBread();
 document.querySelector('.tabs').addEventListener('keydown', handleTablistKeydown);
 
+// Re-apply state when the hash changes (manual address-bar edit, in-app link).
+// applyHashState wraps itself in suppressHashWrite, and its replaceState does not
+// fire hashchange, so re-entry is safe.
+window.addEventListener('hashchange', applyHashState);
+
 suppressHashWrite = false;
 applyHashState();
