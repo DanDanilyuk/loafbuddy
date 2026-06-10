@@ -5,7 +5,7 @@
 // ---------------------------------------------------------------------------
 
 const HASH_DEFAULTS = {
-  rs: 1, rf: 1, h: 75, cw: 0, cs: 50,
+  rs: 1, rf: 1, h: 75, cw: 0, cs: 50, lm: 'feed', lt: 200,
   d: 900, sp: 20, sh: 75, dh: 75, salt: 2, mi: 0, ft: 'bread'
 };
 
@@ -47,6 +47,10 @@ function getActiveFlourType() {
   return document.querySelector('.flour-btn.active')?.dataset.flourType || HASH_DEFAULTS.ft;
 }
 
+function getLevainMode() {
+  return document.querySelector('.starter-mode-btn.active')?.dataset.mode || HASH_DEFAULTS.lm;
+}
+
 function setIfNonDefault(params, key, value) {
   if (value === undefined || value === null) return;
   if (typeof value === 'number' && isNaN(value)) return;
@@ -59,6 +63,8 @@ function hasAnyCustomizations() {
   if (getInputValue('hydration', HASH_DEFAULTS.h) !== HASH_DEFAULTS.h) return true;
   if (getNonNegativeInputValue('containerWeightStarter', 0) !== HASH_DEFAULTS.cw) return true;
   if (getNonNegativeInputValue('currentStarter', 0) !== HASH_DEFAULTS.cs) return true;
+  if (getLevainMode() !== HASH_DEFAULTS.lm) return true;
+  if (getNonNegativeInputValue('levainTarget', HASH_DEFAULTS.lt) !== HASH_DEFAULTS.lt) return true;
 
   if (getNonNegativeInputValue('targetDoughWeight', 900) !== HASH_DEFAULTS.d) return true;
   if (getInputValue('starterPercentage', HASH_DEFAULTS.sp) !== HASH_DEFAULTS.sp) return true;
@@ -109,6 +115,8 @@ function writeHashState() {
   setIfNonDefault(params, 'h', parseFloat(els.hydration.value));
   setIfNonDefault(params, 'cw', getNonNegativeInputValue('containerWeightStarter', 0));
   setIfNonDefault(params, 'cs', getNonNegativeInputValue('currentStarter', 0));
+  setIfNonDefault(params, 'lm', getLevainMode());
+  setIfNonDefault(params, 'lt', getNonNegativeInputValue('levainTarget', HASH_DEFAULTS.lt));
 
   setIfNonDefault(params, 'd', getNonNegativeInputValue('targetDoughWeight', 900));
   setIfNonDefault(params, 'sp', parseFloat(els.starterPercentage.value));
@@ -176,6 +184,14 @@ function applyState(tab, params) {
     if (params.has('cs')) {
       const cs = parseFloat(params.get('cs'));
       if (!isNaN(cs) && cs >= 0) document.getElementById('currentStarter').value = cs;
+    }
+    if (params.has('lt')) {
+      const lt = parseFloat(params.get('lt'));
+      if (!isNaN(lt) && lt > 0) document.getElementById('levainTarget').value = lt;
+    }
+    if (params.has('lm')) {
+      const lm = params.get('lm');
+      if (lm === 'feed' || lm === 'build') setLevainMode(lm);
     }
 
     // Bread params (ft first so the Mixed-flour dh rule below sees it)
@@ -332,6 +348,12 @@ function updatePrintTitle() {
   const isStarterActive = document.getElementById('tab-starter').classList.contains('active');
 
   if (isStarterActive) {
+    if (getLevainMode() === 'build') {
+      const t = getInputValue('levainTarget', HASH_DEFAULTS.lt);
+      const h = getInputValue('hydration', 75);
+      titleEl.textContent = 'Levain - ' + Number(t.toFixed(1)).toString() + ' g, ' + h + '% hydration';
+      return;
+    }
     const rs = getInputValue('feedingRatioStarter', 1);
     const rf = getInputValue('feedingRatioFlour', 1);
     const h = getInputValue('hydration', 75);
@@ -439,6 +461,60 @@ function useStarterInRecipe() {
   const breadSection = document.getElementById('section-bread');
   if (breadSection) {
     breadSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Levain Builder (inverse starter calculator)
+// ---------------------------------------------------------------------------
+
+// Toggle the starter tab between "feed what I have" and "build an amount". The
+// ratio and hydration controls are shared; only the inputs and results swap.
+function setLevainMode(mode) {
+  const isBuild = mode === 'build';
+  setActiveButton('.starter-mode-btn', 'mode', mode);
+  document.getElementById('feedInputs').classList.toggle('hidden', isBuild);
+  document.getElementById('buildInputs').classList.toggle('hidden', !isBuild);
+  document.getElementById('feedResults').classList.toggle('hidden', isBuild);
+  document.getElementById('buildResults').classList.toggle('hidden', !isBuild);
+  calculateStarter();
+}
+
+// Solve the feeding math for the seed amount given a target ready-levain weight:
+// seed = target * rs / (rs + rf + rw), where rw = rf * hydration/100.
+function renderLevain() {
+  const target = getNonNegativeInputValue('levainTarget', HASH_DEFAULTS.lt);
+  const ratioStarter = getInputValue('feedingRatioStarter', 1);
+  const ratioFlour = getInputValue('feedingRatioFlour', 1);
+  const hydration = getInputValue('hydration', 75);
+  const ratioWater = ratioFlour * (hydration / 100);
+
+  const denom = ratioStarter + ratioFlour + ratioWater;
+  const seed = denom > 0 ? target * (ratioStarter / denom) : 0;
+  const flour = ratioStarter > 0 ? seed * (ratioFlour / ratioStarter) : 0;
+  const water = ratioStarter > 0 ? seed * (ratioWater / ratioStarter) : 0;
+
+  displayGrams('levainSeed', seed);
+  displayGrams('levainFlour', flour);
+  displayGrams('levainWater', water);
+}
+
+// Reverse of useStarterInRecipe: jump from a bread recipe to the levain builder
+// pre-filled with the starter amount the recipe needs and its hydration.
+function buildLevainForRecipe() {
+  const target = parseFloat(document.getElementById('netStarter').textContent);
+  const starterHydration = getInputValue('starterHydration', 75);
+
+  if (!isNaN(target) && target > 0) {
+    document.getElementById('levainTarget').value = Number(target.toFixed(1));
+  }
+  setStarterHydration(starterHydration);
+  setLevainMode('build');
+  showTab('starter');
+
+  const starterSection = document.getElementById('section-starter');
+  if (starterSection) {
+    starterSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 }
 
@@ -625,9 +701,11 @@ function resetCalculator() {
   document.getElementById('currentStarter').value = 50;
   document.getElementById('saltPercent').value = 2;
   document.getElementById('mixinsPercent').value = 0;
+  document.getElementById('levainTarget').value = 200;
 
   setReadyTime(1, 1);
   setStarterHydration(75);
+  setLevainMode('feed');
 
   const customBtn = document.getElementById('customWeightBtn');
   if (customBtn) customBtn.classList.remove('active');
@@ -679,6 +757,9 @@ function calculateStarter() {
   displayGrams('flourToAdd', flourToAdd);
   displayGrams('waterToAdd', waterToAdd);
   displayGrams('totalWeight', totalWeight);
+
+  // The levain builder shares the same ratio + hydration, so keep it in sync.
+  renderLevain();
 
   writeHashState();
   updatePrintTitle();
