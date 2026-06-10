@@ -320,6 +320,11 @@ function displayGrams(id, value) {
   document.getElementById(id).textContent = clamp(value).toFixed(1) + ' g';
 }
 
+// Baker's percentage label, trailing zeros dropped (75 -> "75%", 2.5 -> "2.5%").
+function displayPct(id, value) {
+  document.getElementById(id).textContent = Number(value.toFixed(1)).toString() + '%';
+}
+
 function updatePrintTitle() {
   const titleEl = document.getElementById('printTitle');
   if (!titleEl) return;
@@ -749,6 +754,12 @@ function calculateBread() {
   displayGrams('mixins', mixinsWeight);
   els.mixinsRow.classList.toggle('hidden', mixinsPercent <= 0);
   displayGrams('totalDough', clamp(starterWeight) + clamp(flourToAdd) + clamp(waterToAdd) + clamp(salt) + clamp(mixinsWeight));
+
+  // Baker's percentages alongside the grams (Flour is the fixed 100% basis in HTML).
+  displayPct('starterPct', starterPercentage);
+  displayPct('waterPct', doughHydration);
+  displayPct('saltPct', saltPercent);
+  displayPct('mixinsPct', mixinsPercent);
 
   writeHashState();
   updatePrintTitle();
