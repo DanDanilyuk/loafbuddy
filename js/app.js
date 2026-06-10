@@ -16,6 +16,7 @@ const FLOUR_HYDRATION = { ap: 70, bread: 75, ww: 80, rye: 90, spelt: 72 };
 const FLOUR_LABELS = { ap: 'All-Purpose', bread: 'Bread Flour', ww: 'Whole Wheat', rye: 'Rye', spelt: 'Spelt', mix: 'Mixed' };
 const DOUGH_PRESETS = [65, 75, 80, 90];
 const WEIGHT_PRESETS = [650, 900, 1800];
+const STORAGE_KEY = 'loafbuddy-state';
 
 let suppressHashWrite = true;
 
@@ -71,6 +72,22 @@ function updateResetVisibility() {
   btn.classList.toggle('hidden', !hasAnyCustomizations());
 }
 
+// Persist the current state string so a returning visitor (with no shared hash)
+// gets their last setup back. An empty string means all-default, so clear it.
+// localStorage access is wrapped because Safari private mode throws on write.
+function saveStoredState(stateStr) {
+  try {
+    if (stateStr) localStorage.setItem(STORAGE_KEY, stateStr);
+    else localStorage.removeItem(STORAGE_KEY);
+  } catch (e) { /* localStorage unavailable */ }
+}
+
+function clearStoredState() {
+  try {
+    localStorage.removeItem(STORAGE_KEY);
+  } catch (e) { /* localStorage unavailable */ }
+}
+
 function writeHashState() {
   updateResetVisibility();
   if (suppressHashWrite) return;
@@ -107,6 +124,9 @@ function writeHashState() {
   const hasParams = qs.length > 0;
   const allDefault = !hasParams && isStarterActive;
 
+  // Mirror the hash content to localStorage (allDefault clears it).
+  saveStoredState(allDefault ? '' : (hasParams ? tab + '?' + qs : tab));
+
   let newUrl;
   if (allDefault) {
     newUrl = location.pathname + location.search;
@@ -120,90 +140,120 @@ function writeHashState() {
   }
 }
 
+// Apply a parsed (tab, params) pair to the UI. Shared by the hash restore and the
+// localStorage restore so both honor the exact same validation and ordering. The
+// cascade of set* calls is wrapped in suppressHashWrite so nothing writes back
+// mid-apply; the caller runs writeHashState() once afterward.
+function applyState(tab, params) {
+  suppressHashWrite = true;
+  try {
+    // The tab prefix only decides which tab to show; both groups of params are
+    // applied regardless, so a shared URL restores both sections at once.
+    showTab(tab === 'b' ? 'bread' : 'starter');
+
+    // Starter params
+    const hasRs = params.has('rs');
+    const hasRf = params.has('rf');
+    if (hasRs || hasRf) {
+      const rs = hasRs ? parseFloat(params.get('rs')) : HASH_DEFAULTS.rs;
+      const rf = hasRf ? parseFloat(params.get('rf')) : HASH_DEFAULTS.rf;
+      if (!isNaN(rs) && rs > 0 && !isNaN(rf) && rf > 0) setReadyTime(rs, rf);
+    }
+    if (params.has('h')) {
+      const h = parseFloat(params.get('h'));
+      if (!isNaN(h)) setStarterHydration(h);
+    }
+    if (params.has('cw')) {
+      const cw = parseFloat(params.get('cw'));
+      if (!isNaN(cw) && cw >= 0) document.getElementById('containerWeightStarter').value = cw;
+    }
+    if (params.has('cs')) {
+      const cs = parseFloat(params.get('cs'));
+      if (!isNaN(cs) && cs >= 0) document.getElementById('currentStarter').value = cs;
+    }
+
+    // Bread params (ft first so the Mixed-flour dh rule below sees it)
+    if (params.has('ft')) {
+      const ft = params.get('ft');
+      if (VALID_FLOUR_TYPES.indexOf(ft) !== -1) {
+        setFlourType(ft);
+      }
+    }
+    if (params.has('d')) {
+      const d = parseFloat(params.get('d'));
+      if (!isNaN(d) && d > 0) setDoughWeight(d);
+    }
+    if (params.has('sp')) {
+      const sp = parseFloat(params.get('sp'));
+      if (!isNaN(sp) && sp >= 0) setStarterPercentage(sp);
+    }
+    if (params.has('sh')) {
+      const sh = parseFloat(params.get('sh'));
+      if (!isNaN(sh) && sh >= 0) setBreadStarterHydration(sh);
+    }
+    if (params.has('dh')) {
+      const dh = parseFloat(params.get('dh'));
+      if (!isNaN(dh) && dh > 0) {
+        // A non-preset value under Mixed flour lives in the custom input;
+        // anything else maps onto a preset (or sets the raw value).
+        if (getActiveFlourType() === 'mix' && DOUGH_PRESETS.indexOf(dh) === -1) {
+          els.mixedDoughHydration.value = dh;
+          setDefaultHydration();
+        } else {
+          setDoughHydration(dh);
+        }
+      }
+    }
+    if (params.has('salt')) {
+      const salt = parseFloat(params.get('salt'));
+      if (!isNaN(salt)) document.getElementById('saltPercent').value = salt;
+    }
+
+    calculateStarter();
+    calculateBread();
+  } finally {
+    suppressHashWrite = false;
+  }
+}
+
+// Split a stored "tab?qs" state string into its tab and URLSearchParams.
+function parseStateString(stateStr) {
+  const qIndex = stateStr.indexOf('?');
+  const tab = qIndex === -1 ? stateStr : stateStr.slice(0, qIndex);
+  const qs = qIndex === -1 ? '' : stateStr.slice(qIndex + 1);
+  return { tab, params: new URLSearchParams(qs) };
+}
+
 function applyHashState() {
   const hash = location.hash.slice(1);
   if (!hash) return;
 
   try {
-    const qIndex = hash.indexOf('?');
-    const tab = qIndex === -1 ? hash : hash.slice(0, qIndex);
-    const qs = qIndex === -1 ? '' : hash.slice(qIndex + 1);
-    const params = new URLSearchParams(qs);
-
-    suppressHashWrite = true;
-    try {
-      // The tab prefix only decides which tab to show; both groups of params are
-      // applied regardless, so a shared URL restores both sections at once.
-      showTab(tab === 'b' ? 'bread' : 'starter');
-
-      // Starter params
-      const hasRs = params.has('rs');
-      const hasRf = params.has('rf');
-      if (hasRs || hasRf) {
-        const rs = hasRs ? parseFloat(params.get('rs')) : HASH_DEFAULTS.rs;
-        const rf = hasRf ? parseFloat(params.get('rf')) : HASH_DEFAULTS.rf;
-        if (!isNaN(rs) && rs > 0 && !isNaN(rf) && rf > 0) setReadyTime(rs, rf);
-      }
-      if (params.has('h')) {
-        const h = parseFloat(params.get('h'));
-        if (!isNaN(h)) setStarterHydration(h);
-      }
-      if (params.has('cw')) {
-        const cw = parseFloat(params.get('cw'));
-        if (!isNaN(cw) && cw >= 0) document.getElementById('containerWeightStarter').value = cw;
-      }
-      if (params.has('cs')) {
-        const cs = parseFloat(params.get('cs'));
-        if (!isNaN(cs) && cs >= 0) document.getElementById('currentStarter').value = cs;
-      }
-
-      // Bread params (ft first so the Mixed-flour dh rule below sees it)
-      if (params.has('ft')) {
-        const ft = params.get('ft');
-        if (VALID_FLOUR_TYPES.indexOf(ft) !== -1) {
-          setFlourType(ft);
-        }
-      }
-      if (params.has('d')) {
-        const d = parseFloat(params.get('d'));
-        if (!isNaN(d) && d > 0) setDoughWeight(d);
-      }
-      if (params.has('sp')) {
-        const sp = parseFloat(params.get('sp'));
-        if (!isNaN(sp) && sp >= 0) setStarterPercentage(sp);
-      }
-      if (params.has('sh')) {
-        const sh = parseFloat(params.get('sh'));
-        if (!isNaN(sh) && sh >= 0) setBreadStarterHydration(sh);
-      }
-      if (params.has('dh')) {
-        const dh = parseFloat(params.get('dh'));
-        if (!isNaN(dh) && dh > 0) {
-          // A non-preset value under Mixed flour lives in the custom input;
-          // anything else maps onto a preset (or sets the raw value).
-          if (getActiveFlourType() === 'mix' && DOUGH_PRESETS.indexOf(dh) === -1) {
-            els.mixedDoughHydration.value = dh;
-            setDefaultHydration();
-          } else {
-            setDoughHydration(dh);
-          }
-        }
-      }
-      if (params.has('salt')) {
-        const salt = parseFloat(params.get('salt'));
-        if (!isNaN(salt)) document.getElementById('saltPercent').value = salt;
-      }
-
-      calculateStarter();
-      calculateBread();
-    } finally {
-      suppressHashWrite = false;
-    }
-
+    const { tab, params } = parseStateString(hash);
+    applyState(tab, params);
     writeHashState();
   } catch (e) {
     suppressHashWrite = false;
     console.warn('Failed to apply hash state:', e);
+  }
+}
+
+function applyStoredState() {
+  let stored;
+  try {
+    stored = localStorage.getItem(STORAGE_KEY);
+  } catch (e) {
+    return; // localStorage unavailable (e.g. Safari private mode)
+  }
+  if (!stored) return;
+
+  try {
+    const { tab, params } = parseStateString(stored);
+    applyState(tab, params);
+    writeHashState();
+  } catch (e) {
+    suppressHashWrite = false;
+    console.warn('Failed to apply stored state:', e);
   }
 }
 
@@ -532,6 +582,10 @@ function resetCalculator() {
 
   calculateStarter();
   calculateBread();
+
+  // Drop the remembered setup so a reload returns to defaults. This runs last so
+  // the calculate* calls above (which re-save through writeHashState) don't win.
+  clearStoredState();
 }
 
 // ---------------------------------------------------------------------------
@@ -641,4 +695,9 @@ document.querySelector('.tabs').addEventListener('keydown', handleTablistKeydown
 window.addEventListener('hashchange', applyHashState);
 
 suppressHashWrite = false;
-applyHashState();
+// A shared hash always wins; otherwise fall back to the remembered local state.
+if (location.hash) {
+  applyHashState();
+} else {
+  applyStoredState();
+}
