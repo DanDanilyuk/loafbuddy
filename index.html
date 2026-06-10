@@ -93,11 +93,6 @@
       <div class="calculator-section" id="section-starter" role="tabpanel" aria-labelledby="tab-starter">
         <h2>Starter Feeding Calculator</h2>
 
-        <div class="starter-mode-toggle" role="group" aria-label="Starter calculator mode">
-          <button type="button" class="starter-mode-btn active" data-mode="feed" aria-pressed="true" onclick="setLevainMode('feed')">Feed what I have</button>
-          <button type="button" class="starter-mode-btn" data-mode="build" aria-pressed="false" onclick="setLevainMode('build')">Build an amount</button>
-        </div>
-
         <div class="input-group">
           <div id="label-time-buttons" class="group-label">When do you want your starter ready?</div>
           <div class="time-buttons" role="group" aria-labelledby="label-time-buttons">
@@ -136,28 +131,17 @@
           <div class="info-text">Times assume room temp around 75°F (24°C)</div>
         </div>
 
-        <div id="feedInputs">
-          <div class="input-group">
-            <label for="containerWeightStarter">Container Weight (g):</label>
-            <input type="number" inputmode="decimal" id="containerWeightStarter" value="0" min="0" step="0.1" oninput="calculateStarter()" aria-describedby="containerWeightHint">
-            <div class="info-text" id="containerWeightHint">Weigh your empty jar so we can subtract it</div>
-          </div>
-
-          <div class="input-group">
-            <label for="currentStarter">Current Starter + Container (g):</label>
-            <input type="number" inputmode="decimal" id="currentStarter" value="50" min="0" step="1" oninput="calculateStarter()" aria-describedby="currentStarterHint starterContainerWarning">
-            <div class="info-text" id="currentStarterHint">Put your jar on the scale and enter what you see</div>
-            <div class="info-text warning hidden" id="starterContainerWarning" role="alert">That's lighter than the empty jar, so double-check the container weight.</div>
-          </div>
+        <div class="input-group">
+          <label for="containerWeightStarter">Container Weight (g):</label>
+          <input type="number" inputmode="decimal" id="containerWeightStarter" value="0" min="0" step="0.1" oninput="calculateStarter()" aria-describedby="containerWeightHint">
+          <div class="info-text" id="containerWeightHint">Weigh your empty jar so we can subtract it</div>
         </div>
 
-        <div id="buildInputs" class="hidden">
-          <div class="input-group">
-            <div class="info-text">A levain is a fresh offshoot you build for a single bake, so your main starter stays put.</div>
-            <label for="levainTarget">Levain to make (g):</label>
-            <input type="number" inputmode="decimal" id="levainTarget" value="200" min="1" step="1" oninput="calculateStarter()" aria-describedby="levainHint">
-            <div class="info-text" id="levainHint">Match the amount your recipe calls for; we'll split it into seed, flour, and water.</div>
-          </div>
+        <div class="input-group">
+          <label for="currentStarter">Current Starter + Container (g):</label>
+          <input type="number" inputmode="decimal" id="currentStarter" value="50" min="0" step="1" oninput="calculateStarter()" aria-describedby="currentStarterHint starterContainerWarning">
+          <div class="info-text" id="currentStarterHint">Put your jar on the scale and enter what you see</div>
+          <div class="info-text warning hidden" id="starterContainerWarning" role="alert">That's lighter than the empty jar, so double-check the container weight.</div>
         </div>
 
         <div class="input-group">
@@ -189,7 +173,7 @@
           <input type="hidden" id="feedingRatioFlour" value="1">
         </div>
 
-        <div class="results" id="feedResults">
+        <div class="results">
           <h3>Add to Your Starter:</h3>
           <div class="result-item">
             <span class="result-label">Your Starter:</span>
@@ -210,26 +194,6 @@
             </div>
           </div>
           <button type="button" class="secondary-btn" onclick="useStarterInRecipe()">Use this starter in a recipe →</button>
-          <div class="results-actions">
-            <button type="button" class="secondary-btn" onclick="shareRecipe(event)">Share recipe</button>
-            <button type="button" class="secondary-btn" onclick="printRecipe()">Print recipe</button>
-          </div>
-        </div>
-
-        <div class="results hidden" id="buildResults">
-          <h3>Levain Builder</h3>
-          <div class="result-item">
-            <span class="result-label">Seed Starter:</span>
-            <span class="result-value" id="levainSeed">72.7 g</span>
-          </div>
-          <div class="result-item">
-            <span class="result-label">Flour to Add:</span>
-            <span class="result-value" id="levainFlour">72.7 g</span>
-          </div>
-          <div class="result-item">
-            <span class="result-label">Water to Add:</span>
-            <span class="result-value" id="levainWater">54.5 g</span>
-          </div>
           <div class="results-actions">
             <button type="button" class="secondary-btn" onclick="shareRecipe(event)">Share recipe</button>
             <button type="button" class="secondary-btn" onclick="printRecipe()">Print recipe</button>
@@ -436,7 +400,6 @@
               <span class="result-value" id="totalDough">900.0 g</span>
             </div>
           </div>
-          <button type="button" class="secondary-btn" onclick="buildLevainForRecipe()">Need a levain for this recipe? Build one →</button>
           <div class="results-actions">
             <button type="button" class="secondary-btn" onclick="shareRecipe(event)">Share recipe</button>
             <button type="button" class="secondary-btn" onclick="printRecipe()">Print recipe</button>

@@ -2,7 +2,7 @@
 
 // Minimal cache-first service worker for offline use in the kitchen. Bump
 // CACHE_VERSION whenever a cached asset changes so clients pick up the update.
-const CACHE_VERSION = 'loafbuddy-v1';
+const CACHE_VERSION = 'loafbuddy-v2';
 const ASSETS = [
   '/',
   '/index.html',
