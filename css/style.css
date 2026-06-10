@@ -120,6 +120,49 @@ header h1 {
   opacity: 0.8;
 }
 
+/* Levain-builder mode toggle: a compact segmented control under the starter
+   <h2> switching between "feed what I have" and "build an amount". Reads as
+   secondary to the main top tabs - smaller, with a brand-filled active
+   segment instead of the tabs' white one. */
+.starter-mode-toggle {
+  display: flex;
+  gap: 4px;
+  background: #e2e8f0;
+  border-radius: 999px;
+  padding: 4px;
+  margin-bottom: 20px;
+}
+
+.starter-mode-btn {
+  flex: 1;
+  border: none;
+  background: transparent;
+  padding: 10px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  color: #4a5568;
+  transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+}
+
+.starter-mode-btn.active {
+  background: var(--brand-gradient);
+  color: white;
+  box-shadow: 0 2px 8px var(--brand-shadow);
+}
+
+.starter-mode-btn:focus-visible {
+  outline: 2px solid var(--brand-primary);
+  outline-offset: 2px;
+}
+
+@media (hover: hover) {
+  .starter-mode-btn:not(.active):hover {
+    color: var(--brand-primary);
+  }
+}
+
 .calculator-grid {
   display: grid;
   grid-template-columns: 1fr;
@@ -638,6 +681,7 @@ footer p {
   header,
   footer,
   .tab-row,
+  .starter-mode-toggle,
   .input-group,
   .secondary-btn,
   .results-actions,
@@ -797,6 +841,22 @@ footer p {
     background: #1f2937;
     color: white;
     box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08), 0 2px 6px rgba(0, 0, 0, 0.35);
+  }
+
+  /* Mode toggle: darker track and muted resting text; the active segment
+     keeps the brand gradient + white from the base rule. */
+  .starter-mode-toggle {
+    background: #374151;
+  }
+
+  .starter-mode-btn {
+    color: #9ca3af;
+  }
+
+  @media (hover: hover) {
+    .starter-mode-btn:not(.active):hover {
+      color: #a3bffa;
+    }
   }
 
   .hydration-btn,
