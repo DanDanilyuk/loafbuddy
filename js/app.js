@@ -35,6 +35,7 @@ const els = {
   saltPercent: document.getElementById('saltPercent'),
   starterContainerWarning: document.getElementById('starterContainerWarning'),
   saltWarning: document.getElementById('saltWarning'),
+  doughHydrationWarning: document.getElementById('doughHydrationWarning'),
   breadInfeasibleWarning: document.getElementById('breadInfeasibleWarning'),
   breadInfeasibleWarningText: document.getElementById('breadInfeasibleWarningText')
 };
@@ -575,7 +576,7 @@ function resetCalculator() {
   setDefaultHydration();
 
   ['saltWarning', 'starterContainerWarning',
-   'breadInfeasibleWarning'].forEach(id => {
+   'breadInfeasibleWarning', 'doughHydrationWarning'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.classList.add('hidden');
   });
@@ -628,7 +629,8 @@ function calculateBread() {
   const targetDoughWeight = getNonNegativeInputValue('targetDoughWeight', 0);
   const starterPercentage = getInputValue('starterPercentage', 20);
   const starterHydration = getInputValue('starterHydration', 75);
-  const doughHydration = getInputValue('doughHydration', 75);
+  const rawDoughHydration = getInputValue('doughHydration', 75);
+  const doughHydration = Math.min(200, Math.max(1, rawDoughHydration));
   const rawSaltPercent = getInputValue('saltPercent', 2);
   const saltPercent = Math.min(10, Math.max(0, rawSaltPercent));
 
@@ -637,6 +639,12 @@ function calculateBread() {
   const typedValue = parseFloat(saltInput.value);
   const outOfRange = !isNaN(typedValue) && (typedValue < 0 || typedValue > 10);
   saltWarning.classList.toggle('hidden', !outOfRange);
+
+  // Mirror the salt clamp: typed dough hydration bypasses the input's min/max, so
+  // clamp the consumed value to 1-200 and flag it when the typed value is outside.
+  const typedDoughHydration = parseFloat(els.doughHydration.value);
+  const doughHydrationOutOfRange = !isNaN(typedDoughHydration) && (typedDoughHydration < 1 || typedDoughHydration > 200);
+  els.doughHydrationWarning.classList.toggle('hidden', !doughHydrationOutOfRange);
 
   // Total flour from Baker's Percentage:
   // Dough = Flour + Water + Salt = Flour * (1 + hydration% + salt%)
