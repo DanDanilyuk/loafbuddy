@@ -316,6 +316,16 @@ input[type="number"]:focus::-webkit-outer-spin-button {
   color: #2c3e50;
 }
 
+/* Baker's percentage shown next to a .result-label (e.g. "Water: 75%").
+   Smaller, normal-weight and muted to match .info-text so it reads as
+   secondary to the label. */
+.result-pct {
+  margin-left: 6px;
+  font-size: 0.8em;
+  font-weight: 400;
+  color: #5f6c73;
+}
+
 .highlight {
   background: var(--brand-gradient);
   color: white;
@@ -335,6 +345,12 @@ input[type="number"]:focus::-webkit-outer-spin-button {
 .highlight .result-label,
 .highlight .result-value {
   color: white;
+}
+
+/* Robustness: if a percentage ever lands inside the gradient .highlight
+   block, keep it legible (slightly dimmed white rather than muted gray). */
+.highlight .result-pct {
+  color: rgba(255, 255, 255, 0.8);
 }
 
 .secondary-btn {
@@ -681,6 +697,13 @@ footer p {
     color: #000 !important;
   }
 
+  /* Keep the baker's % on paper (the formula is useful), just darken it.
+     !important + a near-black tone keeps it legible even if it ever sits
+     inside .highlight, overriding the dimmed-white screen rule. */
+  .result-pct {
+    color: #333 !important;
+  }
+
   .highlight {
     background: transparent !important;
     color: #000 !important;
@@ -730,6 +753,7 @@ footer p {
   }
 
   .info-text,
+  .result-pct,
   .hydration-ratio,
   .hydration-desc,
   .flour-desc,
