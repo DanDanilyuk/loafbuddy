@@ -409,6 +409,9 @@ function setDefaultHydration() {
 }
 
 function handleDefaultHydrationKeydown(event) {
+  // Ignore keydowns bubbling up from the inner number input - re-running the
+  // handler would refocus/select it and wipe what the user just typed.
+  if (event.target.tagName === 'INPUT') return;
   if (event.key === 'Enter' || event.key === ' ') {
     event.preventDefault();
     setDefaultHydration();
@@ -454,6 +457,9 @@ function toggleCustomWeight() {
 }
 
 function handleCustomWeightKeydown(event) {
+  // Ignore keydowns bubbling up from the inner number input - re-running the
+  // handler would refocus/select it and wipe what the user just typed.
+  if (event.target.tagName === 'INPUT') return;
   if (event.key === 'Enter' || event.key === ' ') {
     event.preventDefault();
     toggleCustomWeight();
