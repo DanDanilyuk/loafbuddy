@@ -340,6 +340,9 @@ function useStarterInRecipe() {
     setBreadStarterHydration(hydration);
   } else {
     document.getElementById('starterHydration').value = hydration;
+    // No preset matches, so clear the button group (deactivates all on no match)
+    // rather than leaving the previously active button stale.
+    setActiveButton('.starter-hydration-buttons .hydration-btn', 'value', hydration);
     calculateBread();
   }
   showTab('bread');
