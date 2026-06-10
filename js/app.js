@@ -429,6 +429,49 @@ function useStarterInRecipe() {
 }
 
 // ---------------------------------------------------------------------------
+// Share
+// ---------------------------------------------------------------------------
+
+let copiedBtn = null;
+let copiedResetTimer = null;
+
+// The current URL already encodes the full recipe (hash state). Offer the native
+// share sheet where available (mobile), otherwise copy the link and flash a brief
+// confirmation on the button that was clicked.
+function shareRecipe(event) {
+  const btn = event.currentTarget;
+  const url = location.href;
+
+  if (navigator.share) {
+    navigator.share({
+      title: 'My Loaf Buddy recipe',
+      text: "Here's my sourdough recipe from Loaf Buddy, with every weight worked out for you.",
+      url: url
+    }).catch(() => { /* user dismissed the share sheet */ });
+    return;
+  }
+
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(url).then(() => flashCopied(btn)).catch(() => { /* copy blocked */ });
+  }
+}
+
+function flashCopied(btn) {
+  // Revert any button still showing the confirmation before flashing this one.
+  if (copiedResetTimer) {
+    clearTimeout(copiedResetTimer);
+    if (copiedBtn) copiedBtn.textContent = 'Share recipe';
+  }
+  btn.textContent = 'Link copied!';
+  copiedBtn = btn;
+  copiedResetTimer = setTimeout(() => {
+    btn.textContent = 'Share recipe';
+    copiedResetTimer = null;
+    copiedBtn = null;
+  }, 2000);
+}
+
+// ---------------------------------------------------------------------------
 // Bread Baking - UI Controls
 // ---------------------------------------------------------------------------
 
