@@ -363,6 +363,22 @@ input[type="number"]:focus::-webkit-outer-spin-button {
   outline-offset: 2px;
 }
 
+/* Action row holding the Share/Print buttons under each .results block.
+   Lays the .secondary-btn children out as a centered, wrapping row and
+   neutralizes their default `margin: 16px auto 0` so flex controls spacing. */
+.results-actions {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.results-actions .secondary-btn {
+  margin: 0;
+}
+
 .info-text {
   font-size: 0.9em;
   color: #5f6c73;
@@ -608,6 +624,7 @@ footer p {
   .tab-row,
   .input-group,
   .secondary-btn,
+  .results-actions,
   .calculator-section > h2 {
     display: none !important;
   }
