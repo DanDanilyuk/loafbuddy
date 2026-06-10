@@ -471,6 +471,11 @@ function flashCopied(btn) {
   }, 2000);
 }
 
+// The print stylesheet handles the layout; this just opens the browser dialog.
+function printRecipe() {
+  window.print();
+}
+
 // ---------------------------------------------------------------------------
 // Bread Baking - UI Controls
 // ---------------------------------------------------------------------------
