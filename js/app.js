@@ -6,7 +6,7 @@
 
 const HASH_DEFAULTS = {
   rs: 1, rf: 1, h: 75, cw: 0, cs: 50,
-  d: 900, sp: 20, sh: 75, dh: 75, salt: 2, ft: 'bread'
+  d: 900, sp: 20, sh: 75, dh: 75, salt: 2, mi: 0, ft: 'bread'
 };
 
 const VALID_FLOUR_TYPES = ['ap', 'bread', 'ww', 'rye', 'spelt', 'mix'];
@@ -33,9 +33,12 @@ const els = {
   defaultHydrationBtn: document.getElementById('defaultHydrationBtn'),
   mixedDoughHydration: document.getElementById('mixedDoughHydration'),
   saltPercent: document.getElementById('saltPercent'),
+  mixinsPercent: document.getElementById('mixinsPercent'),
   starterContainerWarning: document.getElementById('starterContainerWarning'),
   saltWarning: document.getElementById('saltWarning'),
   doughHydrationWarning: document.getElementById('doughHydrationWarning'),
+  mixinsWarning: document.getElementById('mixinsWarning'),
+  mixinsRow: document.getElementById('mixinsRow'),
   breadInfeasibleWarning: document.getElementById('breadInfeasibleWarning'),
   breadInfeasibleWarningText: document.getElementById('breadInfeasibleWarningText')
 };
@@ -62,6 +65,7 @@ function hasAnyCustomizations() {
   if (getInputValue('starterHydration', HASH_DEFAULTS.sh) !== HASH_DEFAULTS.sh) return true;
   if (getInputValue('doughHydration', HASH_DEFAULTS.dh) !== HASH_DEFAULTS.dh) return true;
   if (getInputValue('saltPercent', HASH_DEFAULTS.salt) !== HASH_DEFAULTS.salt) return true;
+  if (getInputValue('mixinsPercent', HASH_DEFAULTS.mi) !== HASH_DEFAULTS.mi) return true;
   if (getActiveFlourType() !== HASH_DEFAULTS.ft) return true;
 
   return false;
@@ -119,6 +123,7 @@ function writeHashState() {
     params.set('dh', String(dh));
   }
   setIfNonDefault(params, 'salt', parseFloat(els.saltPercent.value));
+  setIfNonDefault(params, 'mi', parseFloat(els.mixinsPercent.value));
   setIfNonDefault(params, 'ft', ft);
 
   const qs = params.toString();
@@ -208,6 +213,10 @@ function applyState(tab, params) {
     if (params.has('salt')) {
       const salt = parseFloat(params.get('salt'));
       if (!isNaN(salt)) document.getElementById('saltPercent').value = salt;
+    }
+    if (params.has('mi')) {
+      const mi = parseFloat(params.get('mi'));
+      if (!isNaN(mi)) document.getElementById('mixinsPercent').value = mi;
     }
 
     calculateStarter();
@@ -610,6 +619,7 @@ function resetCalculator() {
   document.getElementById('containerWeightStarter').value = 0;
   document.getElementById('currentStarter').value = 50;
   document.getElementById('saltPercent').value = 2;
+  document.getElementById('mixinsPercent').value = 0;
 
   setReadyTime(1, 1);
   setStarterHydration(75);
@@ -624,7 +634,7 @@ function resetCalculator() {
   setDefaultHydration();
 
   ['saltWarning', 'starterContainerWarning',
-   'breadInfeasibleWarning', 'doughHydrationWarning'].forEach(id => {
+   'breadInfeasibleWarning', 'doughHydrationWarning', 'mixinsWarning'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.classList.add('hidden');
   });
@@ -681,6 +691,8 @@ function calculateBread() {
   const doughHydration = Math.min(200, Math.max(1, rawDoughHydration));
   const rawSaltPercent = getInputValue('saltPercent', 2);
   const saltPercent = Math.min(10, Math.max(0, rawSaltPercent));
+  const rawMixinsPercent = getInputValue('mixinsPercent', 0);
+  const mixinsPercent = Math.min(50, Math.max(0, rawMixinsPercent));
 
   const saltInput = els.saltPercent;
   const saltWarning = els.saltWarning;
@@ -694,9 +706,14 @@ function calculateBread() {
   const doughHydrationOutOfRange = !isNaN(typedDoughHydration) && (typedDoughHydration < 1 || typedDoughHydration > 200);
   els.doughHydrationWarning.classList.toggle('hidden', !doughHydrationOutOfRange);
 
+  // Mix-ins clamp to 0-50%, same warning pattern.
+  const typedMixins = parseFloat(els.mixinsPercent.value);
+  const mixinsOutOfRange = !isNaN(typedMixins) && (typedMixins < 0 || typedMixins > 50);
+  els.mixinsWarning.classList.toggle('hidden', !mixinsOutOfRange);
+
   // Total flour from Baker's Percentage:
-  // Dough = Flour + Water + Salt = Flour * (1 + hydration% + salt%)
-  const totalFlour = targetDoughWeight / (1 + (doughHydration / 100) + (saltPercent / 100));
+  // Dough = Flour + Water + Salt + Mix-ins = Flour * (1 + hydration% + salt% + mixins%)
+  const totalFlour = targetDoughWeight / (1 + (doughHydration / 100) + (saltPercent / 100) + (mixinsPercent / 100));
 
   // Starter is a percentage of total flour
   const starterWeight = totalFlour * (starterPercentage / 100);
@@ -710,6 +727,7 @@ function calculateBread() {
   const totalWater = totalFlour * (doughHydration / 100);
   const waterToAdd = totalWater - waterInStarter;
   const salt = totalFlour * (saltPercent / 100);
+  const mixinsWeight = totalFlour * (mixinsPercent / 100);
 
   const breadInfeasibleWarning = els.breadInfeasibleWarning;
   const breadInfeasibleWarningText = els.breadInfeasibleWarningText;
@@ -728,7 +746,9 @@ function calculateBread() {
   displayGrams('additionalFlour', flourToAdd);
   displayGrams('additionalWater', waterToAdd);
   displayGrams('salt', salt);
-  displayGrams('totalDough', clamp(starterWeight) + clamp(flourToAdd) + clamp(waterToAdd) + clamp(salt));
+  displayGrams('mixins', mixinsWeight);
+  els.mixinsRow.classList.toggle('hidden', mixinsPercent <= 0);
+  displayGrams('totalDough', clamp(starterWeight) + clamp(flourToAdd) + clamp(waterToAdd) + clamp(salt) + clamp(mixinsWeight));
 
   writeHashState();
   updatePrintTitle();

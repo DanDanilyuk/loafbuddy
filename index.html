@@ -360,6 +360,13 @@
           <div class="info-text warning hidden" id="saltWarning" role="alert">Outside 0-10%, so we clamped it to keep your recipe sensible</div>
         </div>
 
+        <div class="input-group">
+          <label for="mixinsPercent">Mix-ins (% of flour):</label>
+          <input type="number" inputmode="decimal" id="mixinsPercent" value="0" min="0" max="50" step="1" oninput="calculateBread()" aria-describedby="mixinsHint mixinsWarning">
+          <div class="info-text" id="mixinsHint">Seeds, nuts, and olives usually run 10-20% of your flour; 15% is a tasty starting point</div>
+          <div class="info-text warning hidden" id="mixinsWarning" role="alert">Outside 0-50%, so we clamped it to keep your dough together</div>
+        </div>
+
         <div class="results">
           <div class="info-text warning hidden" id="breadInfeasibleWarning" role="alert">
             <span id="breadInfeasibleWarningText">That starter carries more water than your dough wants, so lower the Starter % or raise the Dough Hydration.</span>
@@ -380,6 +387,10 @@
           <div class="result-item">
             <span class="result-label">Salt:</span>
             <span class="result-value" id="salt">10.2 g</span>
+          </div>
+          <div class="result-item hidden" id="mixinsRow">
+            <span class="result-label">Mix-ins:</span>
+            <span class="result-value" id="mixins">0.0 g</span>
           </div>
           <div class="highlight">
             <div class="result-item">
