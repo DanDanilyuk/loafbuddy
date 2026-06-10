@@ -74,7 +74,7 @@ header h1 {
   background: transparent;
   border: none;
   padding: 6px 10px;
-  color: #7f8c8d;
+  color: #5f6c73;
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
@@ -365,7 +365,7 @@ input[type="number"]:focus::-webkit-outer-spin-button {
 
 .info-text {
   font-size: 0.9em;
-  color: #7f8c8d;
+  color: #5f6c73;
   margin-top: 5px;
 }
 
