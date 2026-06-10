@@ -788,3 +788,10 @@ if (location.hash) {
 } else {
   applyStoredState();
 }
+
+// Register the service worker for offline support (progressive enhancement).
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').catch(() => { /* offline support unavailable */ });
+  });
+}
