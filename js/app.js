@@ -220,6 +220,29 @@ function setActiveButton(selector, dataAttr, value) {
   });
 }
 
+// Nested interactive controls: customWeightBtn and defaultHydrationBtn each wrap a
+// focusable <input>. Exposing the wrapper as role="button" while its input shows
+// nests two interactive elements, which screen readers announce as one confusing
+// control. Expose exactly one at a time: the wrapper is the button only while its
+// input is collapsed; when the input is visible (Custom weight active, or Mixed
+// dough hydration) the wrapper drops role + tabindex so the input stands alone.
+function setWrapperButtonRole(el, asButton) {
+  if (!el) return;
+  if (asButton) {
+    el.setAttribute('role', 'button');
+    el.setAttribute('tabindex', '0');
+  } else {
+    el.removeAttribute('role');
+    el.removeAttribute('tabindex');
+  }
+}
+
+function syncNestedControlRoles() {
+  const customWrap = document.getElementById('customWeightBtn');
+  if (customWrap) setWrapperButtonRole(customWrap, !customWrap.classList.contains('active'));
+  setWrapperButtonRole(els.defaultHydrationBtn, !els.defaultHydrationBtn.classList.contains('is-mixed'));
+}
+
 function getInputValue(id, fallback) {
   const v = parseFloat(document.getElementById(id).value);
   return isNaN(v) ? fallback : v;
@@ -376,6 +399,7 @@ function setFlourType(type) {
   setActiveButton('.flour-btn', 'flourType', type);
   const isMixed = type === 'mix';
   els.defaultHydrationBtn.classList.toggle('is-mixed', isMixed);
+  syncNestedControlRoles();
 
   if (isMixed) {
     // Mixed has no recommended hydration, so the Default option becomes a manual
@@ -449,12 +473,14 @@ function setDoughWeight(weight) {
   // option, so activate that button to reveal the input with the value in it.
   const isPreset = WEIGHT_PRESETS.indexOf(weight) !== -1;
   setActiveButton('.weight-btn', 'weight', isPreset ? weight : 'custom');
+  syncNestedControlRoles();
   document.getElementById('targetDoughWeight').value = weight;
   calculateBread();
 }
 
 function toggleCustomWeight() {
   setActiveButton('.weight-btn', 'weight', 'custom');
+  syncNestedControlRoles();
 
   const input = document.getElementById('targetDoughWeight');
   input.focus();
@@ -604,6 +630,7 @@ function calculateBread() {
 
 updateRatioLabels();
 updateDefaultHydrationLabel();
+syncNestedControlRoles();
 calculateStarter();
 calculateBread();
 document.querySelector('.tabs').addEventListener('keydown', handleTablistKeydown);
