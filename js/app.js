@@ -145,15 +145,15 @@ function applyHashState() {
         }
         if (params.has('sp')) {
           const sp = parseFloat(params.get('sp'));
-          if (!isNaN(sp)) setStarterPercentage(sp);
+          if (!isNaN(sp) && sp >= 0) setStarterPercentage(sp);
         }
         if (params.has('sh')) {
           const sh = parseFloat(params.get('sh'));
-          if (!isNaN(sh)) setBreadStarterHydration(sh);
+          if (!isNaN(sh) && sh >= 0) setBreadStarterHydration(sh);
         }
         if (params.has('dh')) {
           const dh = parseFloat(params.get('dh'));
-          if (!isNaN(dh)) {
+          if (!isNaN(dh) && dh > 0) {
             // A non-preset value under Mixed flour lives in the custom input;
             // anything else maps onto a preset (or sets the raw value).
             if (getActiveFlourType() === 'mix' && DOUGH_PRESETS.indexOf(dh) === -1) {
@@ -177,7 +177,7 @@ function applyHashState() {
         if (hasRs || hasRf) {
           const rs = hasRs ? parseFloat(params.get('rs')) : HASH_DEFAULTS.rs;
           const rf = hasRf ? parseFloat(params.get('rf')) : HASH_DEFAULTS.rf;
-          if (!isNaN(rs) && !isNaN(rf)) setReadyTime(rs, rf);
+          if (!isNaN(rs) && rs > 0 && !isNaN(rf) && rf > 0) setReadyTime(rs, rf);
         }
         if (params.has('h')) {
           const h = parseFloat(params.get('h'));
