@@ -40,7 +40,8 @@ const els = {
   mixinsWarning: document.getElementById('mixinsWarning'),
   mixinsRow: document.getElementById('mixinsRow'),
   breadInfeasibleWarning: document.getElementById('breadInfeasibleWarning'),
-  breadInfeasibleWarningText: document.getElementById('breadInfeasibleWarningText')
+  breadInfeasibleWarningText: document.getElementById('breadInfeasibleWarningText'),
+  resetBtn: document.querySelector('.reset-btn')
 };
 
 function getActiveFlourType() {
@@ -53,30 +54,6 @@ function setIfNonDefault(params, key, value) {
   if (value !== HASH_DEFAULTS[key]) params.set(key, String(value));
 }
 
-function hasAnyCustomizations() {
-  if (getInputValue('feedingRatioStarter', HASH_DEFAULTS.rs) !== HASH_DEFAULTS.rs) return true;
-  if (getInputValue('feedingRatioFlour', HASH_DEFAULTS.rf) !== HASH_DEFAULTS.rf) return true;
-  if (getInputValue('hydration', HASH_DEFAULTS.h) !== HASH_DEFAULTS.h) return true;
-  if (getNonNegativeInputValue('containerWeightStarter', 0) !== HASH_DEFAULTS.cw) return true;
-  if (getNonNegativeInputValue('currentStarter', 0) !== HASH_DEFAULTS.cs) return true;
-
-  if (getNonNegativeInputValue('targetDoughWeight', 900) !== HASH_DEFAULTS.d) return true;
-  if (getInputValue('starterPercentage', HASH_DEFAULTS.sp) !== HASH_DEFAULTS.sp) return true;
-  if (getInputValue('starterHydration', HASH_DEFAULTS.sh) !== HASH_DEFAULTS.sh) return true;
-  if (getInputValue('doughHydration', HASH_DEFAULTS.dh) !== HASH_DEFAULTS.dh) return true;
-  if (getInputValue('saltPercent', HASH_DEFAULTS.salt) !== HASH_DEFAULTS.salt) return true;
-  if (getInputValue('mixinsPercent', HASH_DEFAULTS.mi) !== HASH_DEFAULTS.mi) return true;
-  if (getActiveFlourType() !== HASH_DEFAULTS.ft) return true;
-
-  return false;
-}
-
-function updateResetVisibility() {
-  const btn = document.querySelector('.reset-btn');
-  if (!btn) return;
-  btn.classList.toggle('hidden', !hasAnyCustomizations());
-}
-
 // Persist the current state string so a returning visitor (with no shared hash)
 // gets their last setup back. An empty string means all-default, so clear it.
 // localStorage access is wrapped because Safari private mode throws on write.
@@ -87,23 +64,19 @@ function saveStoredState(stateStr) {
   } catch (e) { /* localStorage unavailable */ }
 }
 
-function clearStoredState() {
+function readStoredState() {
   try {
-    localStorage.removeItem(STORAGE_KEY);
-  } catch (e) { /* localStorage unavailable */ }
+    return localStorage.getItem(STORAGE_KEY);
+  } catch (e) {
+    return null; // localStorage unavailable (e.g. Safari private mode)
+  }
 }
 
-function writeHashState() {
-  updateResetVisibility();
-  if (suppressHashWrite) return;
-
-  const isStarterActive = els.tabStarter.classList.contains('active');
-  const tab = isStarterActive ? 's' : 'b';
+// Encode every non-default setting as URL params. Both tabs' params share one
+// query string (the keys are disjoint), so an all-default calculator encodes to
+// an empty string.
+function buildStateParams() {
   const params = new URLSearchParams();
-
-  // Persist both tabs' non-default params into one query string (the keys are
-  // disjoint). The s/b prefix only records which tab to show, so switching tabs
-  // no longer discards the other tab's share state.
   setIfNonDefault(params, 'rs', parseFloat(els.feedingRatioStarter.value));
   setIfNonDefault(params, 'rf', parseFloat(els.feedingRatioFlour.value));
   setIfNonDefault(params, 'h', parseFloat(els.hydration.value));
@@ -125,32 +98,41 @@ function writeHashState() {
   setIfNonDefault(params, 'salt', parseFloat(els.saltPercent.value));
   setIfNonDefault(params, 'mi', parseFloat(els.mixinsPercent.value));
   setIfNonDefault(params, 'ft', ft);
+  return params;
+}
 
-  const qs = params.toString();
-  const hasParams = qs.length > 0;
-  const allDefault = !hasParams && isStarterActive;
+// Runs after every change: refresh the UI derived from the whole state, then
+// mirror the state to the URL hash and localStorage.
+function writeHashState() {
+  const qs = buildStateParams().toString();
+  els.resetBtn.classList.toggle('hidden', !qs);
+  updatePrintTitle();
+  if (suppressHashWrite) return;
 
-  // Mirror the hash content to localStorage (allDefault clears it).
-  saveStoredState(allDefault ? '' : (hasParams ? tab + '?' + qs : tab));
+  // The s/b prefix only records which tab to show.
+  const isStarterActive = els.tabStarter.classList.contains('active');
+  const stateStr = (isStarterActive ? 's' : 'b') + (qs ? '?' + qs : '');
+  const allDefault = !qs && isStarterActive;
 
-  let newUrl;
-  if (allDefault) {
-    newUrl = location.pathname + location.search;
-  } else {
-    const newHash = hasParams ? '#' + tab + '?' + qs : '#' + tab;
-    newUrl = location.pathname + location.search + newHash;
-  }
+  saveStoredState(allDefault ? '' : stateStr);
 
+  const newUrl = location.pathname + location.search + (allDefault ? '' : '#' + stateStr);
   if ((location.pathname + location.search + location.hash) !== newUrl) {
     history.replaceState(null, '', newUrl);
   }
 }
 
-// Apply a parsed (tab, params) pair to the UI. Shared by the hash restore and the
-// localStorage restore so both honor the exact same validation and ordering. The
-// cascade of set* calls is wrapped in suppressHashWrite so nothing writes back
-// mid-apply; the caller runs writeHashState() once afterward.
+// Apply a parsed (tab, params) pair to the UI. A missing or invalid key falls
+// back to its default, so the result never depends on what was on screen before:
+// a pasted link fully replaces the current setup, and reset is just empty params.
+// The cascade of set* calls is wrapped in suppressHashWrite so nothing writes
+// back mid-apply; the caller runs writeHashState() once afterward.
 function applyState(tab, params) {
+  const num = (key, isValid = () => true) => {
+    const v = parseFloat(params.get(key));
+    return Number.isFinite(v) && isValid(v) ? v : HASH_DEFAULTS[key];
+  };
+
   suppressHashWrite = true;
   try {
     // The tab prefix only decides which tab to show; both groups of params are
@@ -158,66 +140,29 @@ function applyState(tab, params) {
     showTab(tab === 'b' ? 'bread' : 'starter');
 
     // Starter params
-    const hasRs = params.has('rs');
-    const hasRf = params.has('rf');
-    if (hasRs || hasRf) {
-      const rs = hasRs ? parseFloat(params.get('rs')) : HASH_DEFAULTS.rs;
-      const rf = hasRf ? parseFloat(params.get('rf')) : HASH_DEFAULTS.rf;
-      if (!isNaN(rs) && rs > 0 && !isNaN(rf) && rf > 0) setReadyTime(rs, rf);
-    }
-    if (params.has('h')) {
-      const h = parseFloat(params.get('h'));
-      if (!isNaN(h)) setStarterHydration(h);
-    }
-    if (params.has('cw')) {
-      const cw = parseFloat(params.get('cw'));
-      if (!isNaN(cw) && cw >= 0) document.getElementById('containerWeightStarter').value = cw;
-    }
-    if (params.has('cs')) {
-      const cs = parseFloat(params.get('cs'));
-      if (!isNaN(cs) && cs >= 0) document.getElementById('currentStarter').value = cs;
-    }
+    setReadyTime(num('rs', v => v > 0), num('rf', v => v > 0));
+    setStarterHydration(num('h', v => v >= 0));
+    document.getElementById('containerWeightStarter').value = num('cw', v => v >= 0);
+    document.getElementById('currentStarter').value = num('cs', v => v >= 0);
 
-    // Bread params (ft first so the Mixed-flour dh rule below sees it)
-    if (params.has('ft')) {
-      const ft = params.get('ft');
-      if (VALID_FLOUR_TYPES.indexOf(ft) !== -1) {
-        setFlourType(ft);
-      }
+    // Bread params (ft first so the dough hydration rule below sees it)
+    const ft = VALID_FLOUR_TYPES.includes(params.get('ft')) ? params.get('ft') : HASH_DEFAULTS.ft;
+    setFlourType(ft);
+    setDoughWeight(num('d', v => v > 0));
+    setStarterPercentage(num('sp', v => v >= 0));
+    setBreadStarterHydration(num('sh', v => v >= 0));
+    // No dh means the Default option. A non-preset value under Mixed flour lives
+    // in its custom input; anything else maps onto a preset (or sets the raw value).
+    const dh = parseFloat(params.get('dh'));
+    const hasDh = Number.isFinite(dh) && dh > 0;
+    if (hasDh && (ft !== 'mix' || DOUGH_PRESETS.includes(dh))) {
+      setDoughHydration(dh);
+    } else {
+      els.mixedDoughHydration.value = hasDh ? dh : HASH_DEFAULTS.dh;
+      setDefaultHydration();
     }
-    if (params.has('d')) {
-      const d = parseFloat(params.get('d'));
-      if (!isNaN(d) && d > 0) setDoughWeight(d);
-    }
-    if (params.has('sp')) {
-      const sp = parseFloat(params.get('sp'));
-      if (!isNaN(sp) && sp >= 0) setStarterPercentage(sp);
-    }
-    if (params.has('sh')) {
-      const sh = parseFloat(params.get('sh'));
-      if (!isNaN(sh) && sh >= 0) setBreadStarterHydration(sh);
-    }
-    if (params.has('dh')) {
-      const dh = parseFloat(params.get('dh'));
-      if (!isNaN(dh) && dh > 0) {
-        // A non-preset value under Mixed flour lives in the custom input;
-        // anything else maps onto a preset (or sets the raw value).
-        if (getActiveFlourType() === 'mix' && DOUGH_PRESETS.indexOf(dh) === -1) {
-          els.mixedDoughHydration.value = dh;
-          setDefaultHydration();
-        } else {
-          setDoughHydration(dh);
-        }
-      }
-    }
-    if (params.has('salt')) {
-      const salt = parseFloat(params.get('salt'));
-      if (!isNaN(salt)) document.getElementById('saltPercent').value = salt;
-    }
-    if (params.has('mi')) {
-      const mi = parseFloat(params.get('mi'));
-      if (!isNaN(mi)) document.getElementById('mixinsPercent').value = mi;
-    }
+    document.getElementById('saltPercent').value = num('salt');
+    document.getElementById('mixinsPercent').value = num('mi');
 
     calculateStarter();
     calculateBread();
@@ -234,36 +179,15 @@ function parseStateString(stateStr) {
   return { tab, params: new URLSearchParams(qs) };
 }
 
-function applyHashState() {
-  const hash = location.hash.slice(1);
-  if (!hash) return;
-
+// Apply a state string from the hash or localStorage, then write it back
+// normalized.
+function applyStateString(stateStr) {
   try {
-    const { tab, params } = parseStateString(hash);
+    const { tab, params } = parseStateString(stateStr);
     applyState(tab, params);
     writeHashState();
   } catch (e) {
-    suppressHashWrite = false;
-    console.warn('Failed to apply hash state:', e);
-  }
-}
-
-function applyStoredState() {
-  let stored;
-  try {
-    stored = localStorage.getItem(STORAGE_KEY);
-  } catch (e) {
-    return; // localStorage unavailable (e.g. Safari private mode)
-  }
-  if (!stored) return;
-
-  try {
-    const { tab, params } = parseStateString(stored);
-    applyState(tab, params);
-    writeHashState();
-  } catch (e) {
-    suppressHashWrite = false;
-    console.warn('Failed to apply stored state:', e);
+    console.warn('Failed to apply saved state:', e);
   }
 }
 
@@ -369,7 +293,6 @@ function showTab(which) {
   tabBread.setAttribute('tabindex', isStarter ? '-1' : '0');
 
   writeHashState();
-  updatePrintTitle();
 }
 
 function handleTablistKeydown(event) {
@@ -424,22 +347,13 @@ function setStarterHydration(value) {
 }
 
 function useStarterInRecipe() {
-  const hydration = getInputValue('hydration', 75);
-  const presets = [50, 75, 100, 125];
-  if (presets.indexOf(hydration) !== -1) {
-    setBreadStarterHydration(hydration);
-  } else {
-    document.getElementById('starterHydration').value = hydration;
-    // No preset matches, so clear the button group (deactivates all on no match)
-    // rather than leaving the previously active button stale.
-    setActiveButton('.starter-hydration-buttons .hydration-btn', 'value', hydration);
-    calculateBread();
-  }
+  setBreadStarterHydration(getInputValue('hydration', 75));
   showTab('bread');
-  const breadSection = document.getElementById('section-bread');
-  if (breadSection) {
-    breadSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }
+  // The clicked button just got hidden with the starter tab, so hand focus to
+  // the Bread tab and bring the recipe into view.
+  document.getElementById('tab-bread').focus({ preventScroll: true });
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  document.querySelector('.tab-row').scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
 }
 
 // ---------------------------------------------------------------------------
@@ -451,22 +365,30 @@ let copiedResetTimer = null;
 
 // The current URL already encodes the full recipe (hash state). Offer the native
 // share sheet where available (mobile), otherwise copy the link and flash a brief
-// confirmation on the button that was clicked.
-function shareRecipe(event) {
+// confirmation on the button that was clicked. If both are blocked, show the
+// link in a prompt so it can still be copied by hand.
+async function shareRecipe(event) {
   const btn = event.currentTarget;
   const url = location.href;
 
   if (navigator.share) {
-    navigator.share({
-      title: 'My Loaf Buddy recipe',
-      text: "Here's my sourdough recipe from Loaf Buddy, with every weight worked out for you.",
-      url: url
-    }).catch(() => { /* user dismissed the share sheet */ });
-    return;
+    try {
+      await navigator.share({
+        title: 'My Loaf Buddy recipe',
+        text: "Here's my sourdough recipe from Loaf Buddy, with every weight worked out for you.",
+        url: url
+      });
+      return;
+    } catch (e) {
+      if (e.name === 'AbortError') return; // user dismissed the share sheet
+    }
   }
 
-  if (navigator.clipboard && navigator.clipboard.writeText) {
-    navigator.clipboard.writeText(url).then(() => flashCopied(btn)).catch(() => { /* copy blocked */ });
+  try {
+    await navigator.clipboard.writeText(url);
+    flashCopied(btn);
+  } catch (e) {
+    window.prompt('Copy this link to share your recipe:', url);
   }
 }
 
@@ -516,9 +438,10 @@ function setFlourType(type) {
 
   if (isMixed) {
     // Mixed has no recommended hydration, so the Default option becomes a manual
-    // % input. While Default is the selected option, the typed value is used.
+    // % input. While Default is the selected option, the typed value is used;
+    // seed it with the current hydration so switching flour keeps the dough as is.
     if (isDefaultHydrationActive()) {
-      els.doughHydration.value = getInputValue('mixedDoughHydration', 75);
+      els.mixedDoughHydration.value = els.doughHydration.value;
       if (!suppressHashWrite) {
         els.mixedDoughHydration.focus();
         els.mixedDoughHydration.select();
@@ -620,36 +543,15 @@ function setStarterPercentage(percent) {
 // Reset
 // ---------------------------------------------------------------------------
 
+// Defaults are just an empty state, so reset reuses the same path as a shared link.
 function resetCalculator() {
-  document.getElementById('containerWeightStarter').value = 0;
-  document.getElementById('currentStarter').value = 50;
-  document.getElementById('saltPercent').value = 2;
-  document.getElementById('mixinsPercent').value = 0;
-
-  setReadyTime(1, 1);
-  setStarterHydration(75);
-
-  const customBtn = document.getElementById('customWeightBtn');
-  if (customBtn) customBtn.classList.remove('active');
-  setDoughWeight(900);
-  setStarterPercentage(20);
-  els.mixedDoughHydration.value = 75;
-  setFlourType('bread');
-  setBreadStarterHydration(75);
-  setDefaultHydration();
-
-  ['saltWarning', 'starterContainerWarning',
-   'breadInfeasibleWarning', 'doughHydrationWarning', 'mixinsWarning'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.classList.add('hidden');
-  });
-
-  calculateStarter();
-  calculateBread();
-
-  // Drop the remembered setup so a reload returns to defaults. This runs last so
-  // the calculate* calls above (which re-save through writeHashState) don't win.
-  clearStoredState();
+  applyState(els.tabStarter.classList.contains('active') ? 's' : 'b', new URLSearchParams());
+  writeHashState();
+  // Drop the remembered setup so a reload returns to defaults. This runs after
+  // writeHashState, which would otherwise re-save the open tab.
+  saveStoredState('');
+  // The Reset button just hid itself, so move focus to the open tab.
+  document.querySelector('.tab-btn.active').focus();
 }
 
 // ---------------------------------------------------------------------------
@@ -681,7 +583,6 @@ function calculateStarter() {
   displayGrams('totalWeight', totalWeight);
 
   writeHashState();
-  updatePrintTitle();
 }
 
 // ---------------------------------------------------------------------------
@@ -756,13 +657,15 @@ function calculateBread() {
   displayGrams('totalDough', clamp(starterWeight) + clamp(flourToAdd) + clamp(waterToAdd) + clamp(salt) + clamp(mixinsWeight));
 
   // Baker's percentages alongside the grams (Flour is the fixed 100% basis in HTML).
+  // They are relative to total flour, which includes the starter's share, so
+  // name that basis or "Flour: 100%" reads as wrong next to the flour to add.
   displayPct('starterPct', starterPercentage);
   displayPct('waterPct', doughHydration);
   displayPct('saltPct', saltPercent);
   displayPct('mixinsPct', mixinsPercent);
+  displayGrams('totalFlour', totalFlour);
 
   writeHashState();
-  updatePrintTitle();
 }
 
 // ---------------------------------------------------------------------------
@@ -777,17 +680,14 @@ calculateBread();
 document.querySelector('.tabs').addEventListener('keydown', handleTablistKeydown);
 
 // Re-apply state when the hash changes (manual address-bar edit, in-app link).
-// applyHashState wraps itself in suppressHashWrite, and its replaceState does not
-// fire hashchange, so re-entry is safe.
-window.addEventListener('hashchange', applyHashState);
+// applyState wraps itself in suppressHashWrite, and the replaceState that follows
+// does not fire hashchange, so re-entry is safe.
+window.addEventListener('hashchange', () => applyStateString(location.hash.slice(1)));
 
 suppressHashWrite = false;
 // A shared hash always wins; otherwise fall back to the remembered local state.
-if (location.hash) {
-  applyHashState();
-} else {
-  applyStoredState();
-}
+const savedState = location.hash.slice(1) || readStoredState();
+if (savedState) applyStateString(savedState);
 
 // Register the service worker for offline support (progressive enhancement).
 if ('serviceWorker' in navigator) {
