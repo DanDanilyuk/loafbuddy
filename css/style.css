@@ -419,6 +419,18 @@ input[type="number"]:focus::-webkit-outer-spin-button {
   margin-bottom: 12px;
 }
 
+.highlight + .info-text {
+  margin-top: 10px;
+  text-align: center;
+}
+
+.noscript-message {
+  padding: 12px 20px;
+  text-align: center;
+  font-weight: 500;
+  color: var(--warning-color);
+}
+
 .hydration-btn:focus-visible,
 .flour-btn:focus-visible,
 .time-btn:focus-visible,
@@ -591,8 +603,9 @@ footer {
   font-size: 0.9em;
 }
 
+/* Lighter than --brand-primary, which is too dim on the dark footer to read. */
 footer a {
-  color: #667eea;
+  color: #a3bffa;
   text-decoration: none;
 }
 
@@ -609,12 +622,49 @@ footer p {
     font-size: 2em;
   }
 
+  .main-content {
+    padding: 24px 12px;
+  }
+
+  .calculator-section {
+    padding: 20px;
+  }
+
+  /* Two columns instead of one keep every choice group within a thumb's scroll.
+     The Default dough hydration option spans the row above its four presets. */
   .hydration-buttons,
   .starter-hydration-buttons,
   .dough-hydration-buttons,
   .flour-buttons,
   .time-buttons,
-  .weight-buttons,
+  .weight-buttons {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .dough-hydration-buttons .hydration-btn--default {
+    grid-column: 1 / -1;
+  }
+
+  .hydration-btn,
+  .flour-btn,
+  .time-btn,
+  .weight-btn,
+  .starter-pct-btn {
+    padding: 10px 8px;
+  }
+
+  /* Rise speed stays three across; trim it so "Quick Rise" fits on one line. */
+  .starter-pct-btn {
+    padding: 10px 4px;
+  }
+
+  .starter-pct-btn .hydration-label {
+    font-size: 15px;
+  }
+}
+
+/* Very narrow phones: three rise-speed labels no longer fit side by side. */
+@media (max-width: 359px) {
   .starter-pct-buttons {
     grid-template-columns: 1fr;
   }
@@ -789,7 +839,8 @@ footer p {
     color: #9ca3af;
   }
 
-  .info-text.warning {
+  .info-text.warning,
+  .noscript-message {
     color: #fbbf24;
   }
 
