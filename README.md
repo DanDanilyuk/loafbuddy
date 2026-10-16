@@ -6,13 +6,14 @@ Live site: <https://www.loafbuddy.com>
 
 ## Features
 
-- **Starter Feeding** calculator: pick a ready time (1:1:1 through 1:10:10 ratios), set your jar weight, current starter weight, target starter to keep, and hydration. Tells you how much to discard, how much flour and water to add, and what the jar will weigh after.
-- **Bread Recipe Builder**: pick a loaf size (or Custom), rise speed, flour type, starter hydration, dough hydration, and salt percentage. Outputs the full recipe in grams.
-- **Shareable URLs**: every non-default setting is encoded in the URL hash (`#b?d=900&dh=75&ft=bread`). Copy the address to bookmark or share a specific recipe.
-- **Print-friendly**: hitting Print produces a clean recipe card with a computed title and the active tab's results - no tabs, header, or inputs on paper.
+- **Starter Feeding** calculator: pick a ready time (1:1:1 through 1:10:10 ratios) and hydration, then enter your empty jar weight and the jar with starter in it. Tells you how much flour and water to add and what the jar will weigh after. "Use this starter in a recipe" carries the hydration over to the bread tab.
+- **Bread Recipe Builder**: pick a loaf size (or Custom), rise speed, flour type, starter hydration, dough hydration, salt, and optional mix-ins. Outputs the full recipe in grams with baker's percentages.
+- **Shareable URLs**: every non-default setting is encoded in the URL hash (`#b?d=900&dh=75&ft=bread`). Bookmark it, or use **Share recipe** to send it. Your last setup is also remembered locally for your next visit.
+- **Print-friendly**: **Print recipe** (or the browser's Print) produces a clean recipe card with a computed title and the active tab's results - no tabs, header, or inputs on paper.
 - **Reset** next to the tab strip restores every input to its default. Hidden until something is customized.
 - **Accessible**: keyboard-navigable tablist (arrow keys, Home/End), labelled button groups, `role="alert"` on warnings, `prefers-reduced-motion` respected.
 - **Dark mode**: automatic via `prefers-color-scheme`.
+- **Works offline**: installable as an app, with a service worker (`sw.js`) that serves the last-loaded version when there's no connection.
 
 ## Running locally
 
