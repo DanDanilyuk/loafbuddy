@@ -1,10 +1,55 @@
 :root {
   color-scheme: light dark;
+
   --brand-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   --brand-primary: #667eea;
   --brand-shadow: rgba(102, 126, 234, 0.3);
-  --warning-color: #b45309;
+  --brand-tint: rgba(102, 126, 234, 0.15);
   --font-display: 'American Typewriter', Rockwell, 'Roboto Slab', Georgia, serif;
+
+  /* Theme colors. The rules below only reference these, so dark mode and print
+     are each just another set of values rather than another set of rules. */
+  --page-bg: #f5f7fa;
+  --card-bg: #fff;
+  --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 4px 12px rgba(0, 0, 0, 0.06);
+  --panel-bg: #f8f9fa;
+  --panel-border: #e9ecef;
+  --control-bg: #fff;
+  --input-bg: #fff;
+  --border: #ddd;
+  --leader: #c4ccd4;
+  --track-bg: #e2e8f0;
+  --tab-text: #4a5568;
+  --tab-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+  --heading: #2c3e50;
+  --text: #555;
+  --text-muted: #5f6c73;
+  --link: #5a67d8;
+  --link-hover: #4c51bf;
+  --warning-color: #b45309;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --page-bg: #111827;
+    --card-bg: #1f2937;
+    --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.2), 0 4px 12px rgba(0, 0, 0, 0.15);
+    --panel-bg: #374151;
+    --panel-border: #4b5563;
+    --control-bg: #374151;
+    --input-bg: #111827;
+    --border: #4b5563;
+    --leader: #4b5563;
+    --track-bg: #374151;
+    --tab-text: #b0b7c3;
+    --tab-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08), 0 2px 6px rgba(0, 0, 0, 0.35);
+    --heading: #f3f4f6;
+    --text: #e5e7eb;
+    --text-muted: #b0b7c3;
+    --link: #a3bffa;
+    --link-hover: #c7d2fe;
+    --warning-color: #fbbf24;
+  }
 }
 
 * {
@@ -15,10 +60,22 @@
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-  background: #f5f7fa;
+  background: var(--page-bg);
+  color: var(--text);
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+}
+
+/* Form controls do not inherit the page font on their own. */
+button,
+input {
+  font-family: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid var(--brand-primary);
+  outline-offset: 2px;
 }
 
 header {
@@ -58,42 +115,13 @@ header h1 {
   margin-bottom: 5px;
 }
 
-.reset-btn.hidden {
-  display: inline-block;
-  visibility: hidden;
-}
-
 .tabs {
   display: flex;
   border-radius: 999px;
-  background: #e2e8f0;
+  background: var(--track-bg);
   padding: 4px;
   max-width: 420px;
   width: 100%;
-}
-
-.reset-btn {
-  background: transparent;
-  border: none;
-  padding: 6px 10px;
-  color: #5f6c73;
-  font-size: 13px;
-  font-weight: 500;
-  cursor: pointer;
-  border-radius: 6px;
-  transition: color 0.2s, background 0.2s;
-}
-
-@media (hover: hover) {
-  .reset-btn:hover {
-    color: var(--brand-primary);
-    background: rgba(102, 126, 234, 0.08);
-  }
-}
-
-.reset-btn:focus-visible {
-  outline: 2px solid var(--brand-primary);
-  outline-offset: 2px;
 }
 
 .tab-btn {
@@ -105,40 +133,61 @@ header h1 {
   cursor: pointer;
   font-size: 14px;
   font-weight: 600;
-  color: #4a5568;
+  color: var(--tab-text);
   transition: background 0.2s, color 0.2s, box-shadow 0.2s;
 }
 
 .tab-btn.active {
-  background: white;
-  color: #2d3748;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+  background: var(--card-bg);
+  color: var(--heading);
+  box-shadow: var(--tab-shadow);
 }
 
 .tab-btn span {
   display: block;
   font-size: 11px;
   font-weight: 400;
-  opacity: 0.8;
+}
+
+.reset-btn {
+  background: transparent;
+  border: none;
+  padding: 6px 10px;
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: color 0.2s, background 0.2s;
+}
+
+/* Hidden without collapsing, so the tab row keeps its height. */
+.reset-btn.hidden {
+  display: inline-block;
+  visibility: hidden;
+}
+
+@media (hover: hover) {
+  .reset-btn:hover {
+    color: var(--link);
+    background: var(--brand-tint);
+  }
 }
 
 .calculator-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 25px;
   margin-bottom: 30px;
 }
 
 .calculator-section {
-  background: white;
+  background: var(--card-bg);
   border-radius: 12px;
   padding: 28px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 4px 12px rgba(0, 0, 0, 0.06);
+  box-shadow: var(--card-shadow);
 }
 
 h2 {
   font-family: var(--font-display);
-  color: #34495e;
+  color: var(--heading);
   margin-bottom: 20px;
   padding-bottom: 10px;
   border-bottom: 3px solid var(--brand-primary);
@@ -152,23 +201,24 @@ label,
 .group-label {
   display: block;
   margin-bottom: 5px;
-  color: #555;
+  color: var(--text);
   font-weight: 500;
 }
 
 input[type="number"] {
   width: 100%;
   padding: 10px 12px;
-  border: 2px solid #ddd;
+  border: 2px solid var(--border);
   border-radius: 8px;
   font-size: 16px;
+  background: var(--input-bg);
   transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 input[type="number"]:focus {
   outline: none;
   border-color: var(--brand-primary);
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.12);
+  box-shadow: 0 0 0 3px var(--brand-tint);
 }
 
 input[type="number"]::-webkit-inner-spin-button,
@@ -184,12 +234,10 @@ input[type="number"]:focus::-webkit-outer-spin-button {
   opacity: 1;
 }
 
-.hydration-buttons,
-.starter-hydration-buttons,
-.dough-hydration-buttons,
-.weight-buttons,
-.starter-pct-buttons {
+/* Choice groups: a grid of toggle buttons, three across unless noted. */
+.choice-grid {
   display: grid;
+  grid-template-columns: repeat(3, 1fr);
   gap: 10px;
   margin-top: 10px;
 }
@@ -199,59 +247,39 @@ input[type="number"]:focus::-webkit-outer-spin-button {
 }
 
 .hydration-buttons,
-.starter-hydration-buttons,
-.dough-hydration-buttons {
+.starter-hydration-buttons {
   grid-template-columns: repeat(4, 1fr);
 }
 
-.starter-pct-buttons {
-  grid-template-columns: repeat(3, 1fr);
+.dough-hydration-buttons {
+  grid-template-columns: repeat(5, 1fr);
 }
 
-.flour-buttons,
-.time-buttons {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-  margin-top: 10px;
-}
-
-.hydration-btn,
-.flour-btn,
-.time-btn,
-.weight-btn,
-.starter-pct-btn {
-  background: white;
-  border: 2px solid #ddd;
+.choice-btn {
+  background: var(--control-bg);
+  border: 2px solid var(--border);
   padding: 12px 16px;
   border-radius: 8px;
   cursor: pointer;
   font-size: 14px;
   font-weight: 500;
-  color: #555;
+  color: var(--text);
   transition: border-color 0.2s, color 0.2s, transform 0.15s, box-shadow 0.2s, background 0.2s;
   text-align: center;
 }
 
 @media (hover: hover) {
-
-  .hydration-btn:hover,
-  .flour-btn:hover,
-  .time-btn:hover,
-  .weight-btn:hover,
-  .starter-pct-btn:hover {
+  .choice-btn:hover {
     border-color: var(--brand-primary);
-    color: var(--brand-primary);
+    color: var(--link);
+    background: var(--card-bg);
     transform: translateY(-1px);
-    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.15);
+    box-shadow: 0 2px 8px var(--brand-tint);
   }
 }
 
-.hydration-btn.active,
-.flour-btn.active,
-.time-btn.active,
-.weight-btn.active,
-.starter-pct-btn.active {
+/* After :hover so the selected look wins while hovering. */
+.choice-btn.active {
   background: var(--brand-gradient);
   border-color: var(--brand-primary);
   color: white;
@@ -266,11 +294,13 @@ input[type="number"]:focus::-webkit-outer-spin-button {
   font-weight: 600;
 }
 
+/* The small print inherits the button's color (resting, hover, or selected) and
+   is dimmed only slightly, which keeps it at AA contrast in both themes. */
 .hydration-ratio,
 .time-ratio {
   display: block;
   font-size: 10px;
-  opacity: 0.7;
+  opacity: 0.85;
   margin-top: 2px;
   font-weight: 400;
 }
@@ -280,21 +310,21 @@ input[type="number"]:focus::-webkit-outer-spin-button {
 .time-desc {
   display: block;
   font-size: 11px;
-  opacity: 0.8;
+  opacity: 0.85;
   margin-top: 3px;
 }
 
 .results {
-  background: #f8f9fa;
+  background: var(--panel-bg);
   padding: 20px;
   border-radius: 10px;
   margin-top: 24px;
-  border: 1px solid #e9ecef;
+  border: 1px solid var(--panel-border);
 }
 
 .results h3 {
   font-family: var(--font-display);
-  color: #2c3e50;
+  color: var(--heading);
   margin-bottom: 15px;
   font-size: 1.1em;
 }
@@ -311,13 +341,13 @@ input[type="number"]:focus::-webkit-outer-spin-button {
   flex: 1;
   min-width: 24px;
   margin: 0 10px;
-  border-bottom: 2px dotted #c4ccd4;
+  border-bottom: 2px dotted var(--leader);
   transform: translateY(-4px);
 }
 
 .result-label {
   font-weight: 500;
-  color: #555;
+  color: var(--text);
 }
 
 .result-value {
@@ -325,17 +355,16 @@ input[type="number"]:focus::-webkit-outer-spin-button {
   font-variant-numeric: tabular-nums;
   font-size: 1.05em;
   white-space: nowrap;
-  color: #2c3e50;
+  color: var(--heading);
 }
 
-/* Baker's percentage shown next to a .result-label (e.g. "Water: 75%").
-   Smaller, normal-weight and muted to match .info-text so it reads as
-   secondary to the label. */
+/* Baker's percentage shown next to a .result-label (e.g. "Water: 75%"),
+   muted like .info-text so it reads as secondary to the label. */
 .result-pct {
   margin-left: 6px;
   font-size: 0.8em;
   font-weight: 400;
-  color: #5f6c73;
+  color: var(--text-muted);
 }
 
 .highlight {
@@ -355,19 +384,13 @@ input[type="number"]:focus::-webkit-outer-spin-button {
   color: white;
 }
 
-/* Robustness: if a percentage ever lands inside the gradient .highlight
-   block, keep it legible (slightly dimmed white rather than muted gray). */
-.highlight .result-pct {
-  color: rgba(255, 255, 255, 0.8);
-}
-
 .secondary-btn {
   display: block;
   margin: 16px auto 0;
   background: transparent;
   border: none;
   padding: 6px 4px;
-  color: var(--brand-primary);
+  color: var(--link);
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
@@ -377,19 +400,13 @@ input[type="number"]:focus::-webkit-outer-spin-button {
 
 @media (hover: hover) {
   .secondary-btn:hover {
-    color: #4c51bf;
+    color: var(--link-hover);
     text-decoration: underline;
   }
 }
 
-.secondary-btn:focus-visible {
-  outline: 2px solid var(--brand-primary);
-  outline-offset: 2px;
-}
-
-/* Action row holding the Share/Print buttons under each .results block.
-   Lays the .secondary-btn children out as a centered, wrapping row and
-   neutralizes their default `margin: 16px auto 0` so flex controls spacing. */
+/* Share/Print row under each .results block: a centered, wrapping row whose gap
+   replaces the buttons' own margin. */
 .results-actions {
   display: flex;
   justify-content: center;
@@ -405,7 +422,7 @@ input[type="number"]:focus::-webkit-outer-spin-button {
 
 .info-text {
   font-size: 0.9em;
-  color: #5f6c73;
+  color: var(--text-muted);
   margin-top: 5px;
 }
 
@@ -431,28 +448,17 @@ input[type="number"]:focus::-webkit-outer-spin-button {
   color: var(--warning-color);
 }
 
-.hydration-btn:focus-visible,
-.flour-btn:focus-visible,
-.time-btn:focus-visible,
-.weight-btn:focus-visible,
-.starter-pct-btn:focus-visible,
-.tab-btn:focus-visible {
-  outline: 2px solid var(--brand-primary);
-  outline-offset: 2px;
-}
-
-.weight-btn {
-  min-height: 58px;
-}
-
-.weight-btn--custom {
+/* The Custom weight and Default hydration options are divs that swap their
+   label for a number input, so they center whichever of the two is showing. */
+.weight-btn--custom,
+.hydration-btn--default {
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.weight-btn-label {
-  display: block;
+.weight-btn {
+  min-height: 58px;
 }
 
 .weight-btn-input {
@@ -470,7 +476,9 @@ input[type="number"]:focus::-webkit-outer-spin-button {
   display: flex;
 }
 
-.weight-btn--custom .weight-btn-input input[type="number"] {
+/* A white pill on the selected gradient, in both themes (hence the fixed
+   light color-scheme, which keeps its spinner arrows light too). */
+.weight-btn-input input[type="number"] {
   width: 100%;
   max-width: 140px;
   padding: 6px 10px;
@@ -480,16 +488,16 @@ input[type="number"]:focus::-webkit-outer-spin-button {
   font-weight: 600;
   background: rgba(255, 255, 255, 0.95);
   color: #2d3748;
+  color-scheme: light;
   text-align: center;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
 }
 
-.weight-btn--custom .weight-btn-input input[type="number"]:focus {
-  outline: none;
+.weight-btn-input input[type="number"]:focus {
   box-shadow: 0 0 0 2px #fff, 0 1px 2px rgba(0, 0, 0, 0.08);
 }
 
-.weight-btn--custom .weight-btn-suffix {
+.weight-btn-suffix {
   margin-left: 6px;
   color: white;
   font-size: 13px;
@@ -497,25 +505,9 @@ input[type="number"]:focus::-webkit-outer-spin-button {
   opacity: 0.9;
 }
 
-/* Default dough-hydration option: sits inline as the first of five buttons, tracks
-   the flour (named) or holds a manual % input (Mixed). Mirrors the custom pattern. */
-.dough-hydration-buttons {
-  grid-template-columns: repeat(5, 1fr);
-}
-
-.dough-hydration-buttons .hydration-btn--default {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.hydration-default-label {
-  display: block;
-}
-
-/* Mixed flour turns the option into a clean, label-led custom % field. The number
-   is borderless and inherits the button's text color, so it reads on both the
-   active gradient and the resting state without a floating white box. */
+/* Mixed flour turns the Default hydration option into a label-led custom %
+   field. The number is borderless and inherits the button's text color, so it
+   reads on both the selected gradient and the resting state. */
 .hydration-default-input {
   display: none;
   flex-direction: column;
@@ -524,11 +516,11 @@ input[type="number"]:focus::-webkit-outer-spin-button {
   width: 100%;
 }
 
-.hydration-btn--default.is-mixed .hydration-default-label {
+.is-mixed .hydration-default-label {
   display: none;
 }
 
-.hydration-btn--default.is-mixed .hydration-default-input {
+.is-mixed .hydration-default-input {
   display: flex;
 }
 
@@ -537,7 +529,7 @@ input[type="number"]:focus::-webkit-outer-spin-button {
   font-weight: 700;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  opacity: 0.7;
+  opacity: 0.85;
 }
 
 .hydration-custom-field {
@@ -567,8 +559,9 @@ input[type="number"]:focus::-webkit-outer-spin-button {
   appearance: textfield;
 }
 
+/* The thickening underline above is this field's focus cue. */
 .hydration-default-input input[type="number"]:focus {
-  outline: none;
+  box-shadow: none;
 }
 
 .hydration-default-input input[type="number"]::-webkit-inner-spin-button,
@@ -595,6 +588,8 @@ input[type="number"]:focus::-webkit-outer-spin-button {
   border: 0;
 }
 
+/* The footer is dark in both themes, so its colors are fixed. The links are
+   lighter than --brand-primary, which is too dim to read on it. */
 footer {
   background: #2d3748;
   color: white;
@@ -603,7 +598,6 @@ footer {
   font-size: 0.9em;
 }
 
-/* Lighter than --brand-primary, which is too dim on the dark footer to read. */
 footer a {
   color: #a3bffa;
   text-decoration: none;
@@ -630,30 +624,22 @@ footer p {
     padding: 20px;
   }
 
-  /* Two columns instead of one keep every choice group within a thumb's scroll.
-     The Default dough hydration option spans the row above its four presets. */
-  .hydration-buttons,
-  .starter-hydration-buttons,
-  .dough-hydration-buttons,
-  .flour-buttons,
-  .time-buttons,
-  .weight-buttons {
+  /* Two columns keep every choice group within a thumb's scroll. Rise speed
+     stays three across, and the Default dough hydration option spans the row
+     above its four presets. */
+  .choice-grid:not(.starter-pct-buttons) {
     grid-template-columns: repeat(2, 1fr);
   }
 
-  .dough-hydration-buttons .hydration-btn--default {
+  .hydration-btn--default {
     grid-column: 1 / -1;
   }
 
-  .hydration-btn,
-  .flour-btn,
-  .time-btn,
-  .weight-btn,
-  .starter-pct-btn {
+  .choice-btn {
     padding: 10px 8px;
   }
 
-  /* Rise speed stays three across; trim it so "Quick Rise" fits on one line. */
+  /* Trimmed so "Quick Rise" fits on one line at three across. */
   .starter-pct-btn {
     padding: 10px 4px;
   }
@@ -679,15 +665,12 @@ footer p {
     animation: none !important;
   }
 
-  .hydration-btn:hover,
-  .flour-btn:hover,
-  .time-btn:hover,
-  .weight-btn:hover,
-  .starter-pct-btn:hover {
+  .choice-btn:hover {
     transform: none;
   }
 }
 
+/* Utility. Kept after the component rules so it beats their display values. */
 .hidden {
   display: none;
 }
@@ -696,15 +679,25 @@ footer p {
   display: none;
 }
 
+/* Print: a recipe card with just the computed title and the open tab's
+   results. Kept last so it overrides everything above, dark theme included. */
 @media print {
   @page {
     margin: 0.5in;
   }
 
-  html,
-  body {
-    background: #fff !important;
-    color: #000 !important;
+  :root {
+    color-scheme: light;
+    --page-bg: #fff;
+    --card-bg: transparent;
+    --card-shadow: none;
+    --panel-bg: transparent;
+    --panel-border: #000;
+    --leader: #444;
+    --heading: #000;
+    --text: #000;
+    --text-muted: #333;
+    --warning-color: #000;
   }
 
   body {
@@ -718,7 +711,7 @@ footer p {
   .secondary-btn,
   .results-actions,
   .calculator-section > h2 {
-    display: none !important;
+    display: none;
   }
 
   .main-content {
@@ -728,16 +721,11 @@ footer p {
   }
 
   .calculator-grid {
-    display: block;
-    gap: 0;
     margin: 0;
   }
 
   .calculator-section {
-    background: transparent !important;
-    padding: 0 !important;
-    border: none !important;
-    box-shadow: none !important;
+    padding: 0;
   }
 
   .print-title {
@@ -753,14 +741,11 @@ footer p {
   }
 
   .results {
-    background: transparent !important;
-    border: 1px solid #000 !important;
     margin-top: 0;
     padding: 14pt;
   }
 
   .results h3 {
-    color: #000 !important;
     margin-bottom: 10pt;
   }
 
@@ -768,187 +753,24 @@ footer p {
     padding: 5pt 0;
   }
 
-  /* Dotted leaders belong on a printed recipe card; just ink them. */
-  .dots {
-    border-bottom-color: #444 !important;
-  }
-
-  .result-label,
-  .result-value {
-    color: #000 !important;
-  }
-
-  /* Keep the baker's % on paper (the formula is useful), just darken it.
-     !important + a near-black tone keeps it legible even if it ever sits
-     inside .highlight, overriding the dimmed-white screen rule. */
-  .result-pct {
-    color: #333 !important;
-  }
-
   .highlight {
-    background: transparent !important;
-    color: #000 !important;
+    background: none;
     border: 2px solid #000;
     margin-top: 10pt;
     padding: 10pt 12pt;
-    box-shadow: none !important;
   }
 
   .highlight .result-label,
   .highlight .result-value {
-    color: #000 !important;
+    color: #000;
     font-weight: 700;
   }
 
+  .highlight .dots {
+    border-bottom-color: var(--leader);
+  }
+
   .info-text.warning {
-    color: #000 !important;
     font-weight: 600;
-  }
-}
-
-/* Auto dark mode */
-@media (prefers-color-scheme: dark) {
-  body {
-    background: #111827;
-    color: #f3f4f6;
-  }
-
-  .calculator-section {
-    background: #1f2937;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2), 0 4px 12px rgba(0, 0, 0, 0.15);
-  }
-
-  h2 {
-    color: #f3f4f6;
-  }
-
-  label,
-  .group-label,
-  .result-label,
-  .result-value {
-    color: #e5e7eb;
-  }
-
-  .info-text,
-  .result-pct,
-  .hydration-ratio,
-  .hydration-desc,
-  .flour-desc,
-  .time-desc,
-  .time-ratio {
-    color: #9ca3af;
-  }
-
-  .info-text.warning,
-  .noscript-message {
-    color: #fbbf24;
-  }
-
-  .results {
-    background: #374151;
-    border-color: #4b5563;
-  }
-
-  .results h3 {
-    color: #f3f4f6;
-  }
-
-  .dots {
-    border-bottom-color: #4b5563;
-  }
-
-  input[type="number"] {
-    background: #111827;
-    color: white;
-    border-color: #4b5563;
-  }
-
-  .tabs {
-    background: #374151;
-  }
-
-  .tab-btn {
-    color: #9ca3af;
-  }
-
-  .tab-btn.active {
-    background: #1f2937;
-    color: white;
-    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08), 0 2px 6px rgba(0, 0, 0, 0.35);
-  }
-
-  .hydration-btn,
-  .flour-btn,
-  .time-btn,
-  .weight-btn,
-  .starter-pct-btn {
-    background: #374151;
-    border-color: #4b5563;
-    color: #e5e7eb;
-  }
-
-  /* Dark mode hover only on hover-capable devices (prevents sticky hover on mobile) */
-  @media (hover: hover) {
-
-    .hydration-btn:hover,
-    .flour-btn:hover,
-    .time-btn:hover,
-    .weight-btn:hover,
-    .starter-pct-btn:hover {
-      border-color: var(--brand-primary);
-      color: #a3bffa;
-      background: #1f2937;
-    }
-  }
-
-  /* Ensure active state always wins in dark mode */
-  .hydration-btn.active,
-  .flour-btn.active,
-  .time-btn.active,
-  .weight-btn.active,
-  .starter-pct-btn.active {
-    background: var(--brand-gradient);
-    border-color: var(--brand-primary);
-    color: white;
-    box-shadow: 0 4px 12px var(--brand-shadow);
-  }
-
-  /* Descendant text (ratio/desc spans) gets an explicit gray color
-     above; re-inherit white when inside an active button. */
-  .hydration-btn.active .hydration-ratio,
-  .hydration-btn.active .hydration-desc,
-  .flour-btn.active .flour-desc,
-  .time-btn.active .time-ratio,
-  .time-btn.active .time-desc,
-  .weight-btn.active .hydration-ratio,
-  .weight-btn.active .hydration-desc,
-  .starter-pct-btn.active .hydration-ratio,
-  .starter-pct-btn.active .hydration-desc {
-    color: inherit;
-  }
-
-  input[type="number"]:focus {
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
-  }
-
-  .secondary-btn {
-    color: #a3bffa;
-  }
-
-  @media (hover: hover) {
-    .secondary-btn:hover {
-      color: #c7d2fe;
-    }
-  }
-
-  .reset-btn {
-    color: #9ca3af;
-  }
-
-  @media (hover: hover) {
-    .reset-btn:hover {
-      color: #a3bffa;
-      background: rgba(102, 126, 234, 0.15);
-    }
   }
 }

@@ -31,8 +31,11 @@ If you edit `js/app.js` or `css/style.css`, the browser may serve cached copies 
 
 ```
 index.html       Markup only: structure, content, and onclick wiring.
-css/style.css    All styles. Light and dark modes, responsive grids, print rules.
+css/style.css    All styles. Theme tokens (light, dark, print), responsive grids.
 js/app.js        All logic. Starter and bread calculators, UI handlers, URL state.
+sw.js            Network-first service worker for offline use.
+manifest.json    Web app manifest (install name, icons, colors).
+wrangler.jsonc   Cloudflare Workers static-assets config.
 LICENSE          Apache 2.0.
 ```
 
@@ -40,7 +43,7 @@ LICENSE          Apache 2.0.
 
 - Vanilla HTML, CSS, and JavaScript.
 - No frameworks, no bundlers, no dependencies, no build step.
-- Hosted on GitHub Pages.
+- Hosted on Cloudflare Workers static assets (`wrangler.jsonc`).
 
 ## Contributing
 
@@ -50,7 +53,7 @@ Issues and pull requests welcome.
 
 - **Keep it vanilla.** No npm, no bundlers, no frameworks. The appeal of this project is that you can `View Source` and understand the whole thing.
 - **Calculation math** in `js/app.js` uses standard baker's percentage formulas. Don't change a formula unless you understand the baking math behind it and can explain why.
-- **CSS uses `@media (prefers-color-scheme: dark)`** for dark mode. Don't add a manual toggle - let the OS decide.
+- **CSS uses `@media (prefers-color-scheme: dark)`** for dark mode, and it only overrides the color tokens. Don't add a manual toggle - let the OS decide.
 - **Button handlers are wired with inline `onclick="..."`**. Keep function names in sync between HTML and JS when renaming.
 
 ### Getting set up
@@ -64,14 +67,14 @@ Issues and pull requests welcome.
 1. Create a branch: `git checkout -b your-change`.
 2. Edit `index.html`, `css/style.css`, or `js/app.js` as needed.
 3. Test in your browser at both desktop and mobile widths. Check light AND dark modes.
-4. If your change adds a new input or result, verify it survives a page reload via the URL hash (see `writeHashState` / `applyHashState` in `js/app.js`), or deliberately document that it doesn't.
+4. If your change adds a new input or result, verify it survives a page reload via the URL hash (see `writeHashState` / `applyState` in `js/app.js`), or deliberately document that it doesn't.
 5. Sanity-check Print (⌘P / Ctrl-P) if you touched anything visual.
 6. Commit with a concise message that says *why* the change matters.
 7. Open a pull request against `main`.
 
 ### Style notes
 
-- CSS custom properties (`--brand-gradient`, `--brand-primary`, `--brand-shadow`, `--warning-color`) are defined in `:root` with dark-mode overrides. Reuse these tokens rather than introducing new colors.
+- Colors are CSS custom properties defined in `:root` (`--brand-primary`, `--text`, `--card-bg`, `--warning-color`, and so on), with one block of dark-mode values and one of print values. Rules reference the tokens, so reuse them rather than introducing new colors or per-theme rules.
 - Keep comments for the *why*, not the *what*. Descriptive names do the rest.
 - Prefer editing existing functions over adding new ones for small changes. The file is short on purpose.
 
